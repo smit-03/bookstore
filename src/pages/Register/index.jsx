@@ -2,6 +2,7 @@ import React from 'react';
 import { styled } from '@mui/system';
 import { TextField, Button, Typography, Container } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
+// import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 const validationSchema = Yup.object().shape({
@@ -23,6 +24,24 @@ const initialValues = {
     password: '',
     confirmPassword: '',
 };
+
+
+//makeStyles is not compatible with 'react-18'. Can use styled compo. instead
+/* const useStyles = makeStyles((theme) => ({
+    root: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        marginTop: theme.spacing(4),
+    },
+    form: {
+        width: '100%',
+        marginTop: theme.spacing(2),
+    },
+    submitButton: {
+        margin: theme.spacing(3, 0, 2),
+    },
+})); */
 
 const FormContainer = styled('div')`
   display: flex;
@@ -58,10 +77,17 @@ const RegisterButton = styled(Button)`
 `;
 
 const RegistrationPage = () => {
+
     const handleSubmit = (values) => {
-        // Handle form submission logic here
-        console.log(values);
+        console.log(JSON.stringify(values));
     };
+
+    // useFormik Hook
+    /* const formik = useFormik({
+        initialValues,
+        validationSchema,
+        onSubmit: handleSubmit,
+    }); */
 
     return (
         <Container component="main">
@@ -136,7 +162,7 @@ const RegistrationPage = () => {
                                 />
                             </FieldWrapper>
 
-                            <RegisterButton type="submit" variant="contained" >
+                            <RegisterButton type="submit" variant="contained">
                                 Register
                             </RegisterButton>
                         </Form>
