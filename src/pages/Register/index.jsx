@@ -82,7 +82,7 @@ const RegistrationPage = () => {
         console.log(JSON.stringify(values));
     };
 
-    // useFormik Hook
+    // We can use 'useFormik' Hook instead of <Formik> comp. of 'formik'
     /* const formik = useFormik({
         initialValues,
         validationSchema,
