@@ -1,17 +1,19 @@
 import React from 'react';
 import { styled } from '@mui/system';
-import { TextField, Button, Typography, Container } from '@mui/material';
+import { TextField, Button, Typography, Container, MenuItem } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
-// import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import CustomSelect from './CustomSelect';
+import authService from '../../service/auth.service';
+// import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const validationSchema = Yup.object().shape({
     firstName: Yup.string().required('First Name is required'),
     lastName: Yup.string().required('Last Name is required'),
     email: Yup.string().email('Invalid email').required('Email is required'),
-    password: Yup.string()
-        .required('Password is required')
-        .min(8, 'Password must be at least 8 characters long'),
+    roleId: Yup.number().required('Role is required'),
+    password: Yup.string().required('Password is required').min(4, 'Password must be at least 4 characters long'),
     confirmPassword: Yup.string()
         .required('Confirm Password is required')
         .oneOf([Yup.ref('password'), null], 'Passwords must match'),
@@ -21,6 +23,7 @@ const initialValues = {
     firstName: '',
     lastName: '',
     email: '',
+    roleId: '',
     password: '',
     confirmPassword: '',
 };
@@ -67,7 +70,7 @@ const SectionTitle = styled('h2')`
 const FieldWrapper = styled('div')`
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 `;
 
 const RegisterButton = styled(Button)`
@@ -76,10 +79,17 @@ const RegisterButton = styled(Button)`
   background-color: red;
 `;
 
-const RegistrationPage = () => {
 
-    const handleSubmit = (values) => {
-        console.log(JSON.stringify(values));
+const RegistrationPage = () => {
+    // const navigate = useNavigate();
+    const handleSubmit = (data) => {
+        console.log(data);
+        delete data.id;
+        delete data.confirmPassword;
+        authService.create(data).then((res) => {
+            // navigate("/login");
+            toast.success("Successfully Registered");
+        })
     };
 
     // We can use 'useFormik' Hook instead of <Formik> comp. of 'formik'
@@ -91,8 +101,8 @@ const RegistrationPage = () => {
 
     return (
         <Container component="main">
-            <FormContainer style={{ margin: '2rem' }}>
-                <Typography component="h1" variant="h4" align="center" marginY='4rem'>
+            <FormContainer>
+                <Typography component="h1" variant="h4" align="center" marginY="4rem">
                     Login or Register
                 </Typography>
                 <Formik
@@ -125,16 +135,33 @@ const RegistrationPage = () => {
                                     helperText={touched.lastName && errors.lastName}
                                 />
                             </FieldWrapper>
-                            <Field
-                                as={TextField}
-                                variant="outlined"
-                                fullWidth
-                                id="email"
-                                name="email"
-                                label="Email Address"
-                                error={touched.email && !!errors.email}
-                                helperText={touched.email && errors.email}
-                            />
+
+                            <FieldWrapper>
+                                <Field
+                                    as={TextField}
+                                    variant="outlined"
+                                    fullWidth
+                                    id="email"
+                                    name="email"
+                                    label="Email Address"
+                                    error={touched.email && !!errors.email}
+                                    helperText={touched.email && errors.email}
+                                />
+                                <Field
+                                    component={CustomSelect}
+                                    variant="outlined"
+                                    fullWidth
+                                    id="roleId"
+                                    name="roleId"
+                                    label="Role"
+                                    error={errors.role && touched.role}
+                                    helperText={errors.role && touched.role && errors.role}
+                                >
+                                    <MenuItem value="1">Buyer</MenuItem>
+                                    <MenuItem value="2">Seller</MenuItem>
+                                </Field>
+
+                            </FieldWrapper>
 
                             <SectionTitle>Login Information</SectionTitle>
                             <FieldWrapper>
@@ -161,8 +188,7 @@ const RegistrationPage = () => {
                                     helperText={touched.confirmPassword && errors.confirmPassword}
                                 />
                             </FieldWrapper>
-
-                            <RegisterButton type="submit" variant="contained">
+                            <RegisterButton type="submit" variant="contained" color="success">
                                 Register
                             </RegisterButton>
                         </Form>
