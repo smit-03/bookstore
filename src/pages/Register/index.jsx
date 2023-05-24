@@ -3,9 +3,7 @@ import { styled } from '@mui/system';
 import { TextField, Button, Typography, Container, MenuItem } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import CustomSelect from './CustomSelect';
 import authService from '../../service/auth.service';
-// import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -28,7 +26,6 @@ const initialValues = {
     password: '',
     confirmPassword: '',
 };
-
 
 //makeStyles is not compatible with 'react-18'. Can use styled compo. instead
 /* const useStyles = makeStyles((theme) => ({
@@ -80,22 +77,22 @@ const RegisterButton = styled(Button)`
   background-color: red;
 `;
 
-
 const RegistrationPage = () => {
-    // const navigate = useNavigate();
     const handleSubmit = (data) => {
         console.log(data);
+        // data.roleId === 1 ? data.role = "Buyer" : data.role = "Seller";
         delete data.id;
         delete data.confirmPassword;
-        authService.create(data)
+
+        authService
+            .create(data)
             .then((res) => {
-                // navigate("/login");
-                console.log("Registered!!");
-                toast.success("Successfully Registered");
+                console.log('Registered!!');
+                toast.success('Successfully Registered');
             })
             .catch((error) => {
                 toast.error();
-            })
+            });
     };
 
     // We can use 'useFormik' Hook instead of <Formik> comp. of 'formik'
@@ -112,11 +109,7 @@ const RegistrationPage = () => {
                 <Typography component="h1" variant="h4" align="center" marginY="4rem">
                     Login or Register
                 </Typography>
-                <Formik
-                    initialValues={initialValues}
-                    validationSchema={validationSchema}
-                    onSubmit={handleSubmit}
-                >
+                <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
                     {({ errors, touched }) => (
                         <Form>
                             <SectionTitle>Personal Information</SectionTitle>
@@ -155,19 +148,19 @@ const RegistrationPage = () => {
                                     helperText={touched.email && errors.email}
                                 />
                                 <Field
-                                    component={CustomSelect}
+                                    as={TextField}
                                     variant="outlined"
                                     fullWidth
                                     id="roleId"
                                     name="roleId"
+                                    select
                                     label="Role"
-                                    error={errors.role && touched.role}
-                                    helperText={errors.role && touched.role && errors.role}
+                                    error={touched.roleId && !!errors.roleId}
+                                    helperText={touched.roleId && errors.roleId}
                                 >
-                                    <MenuItem value="1">Buyer</MenuItem>
-                                    <MenuItem value="2">Seller</MenuItem>
+                                    <MenuItem value={1}>Buyer</MenuItem>
+                                    <MenuItem value={2}>Seller</MenuItem>
                                 </Field>
-
                             </FieldWrapper>
 
                             <SectionTitle>Login Information</SectionTitle>
