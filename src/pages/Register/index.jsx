@@ -6,7 +6,8 @@ import * as Yup from 'yup';
 import CustomSelect from './CustomSelect';
 import authService from '../../service/auth.service';
 // import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const validationSchema = Yup.object().shape({
     firstName: Yup.string().required('First Name is required'),
@@ -86,10 +87,15 @@ const RegistrationPage = () => {
         console.log(data);
         delete data.id;
         delete data.confirmPassword;
-        authService.create(data).then((res) => {
-            // navigate("/login");
-            toast.success("Successfully Registered");
-        })
+        authService.create(data)
+            .then((res) => {
+                // navigate("/login");
+                console.log("Registered!!");
+                toast.success("Successfully Registered");
+            })
+            .catch((error) => {
+                toast.error();
+            })
     };
 
     // We can use 'useFormik' Hook instead of <Formik> comp. of 'formik'
@@ -101,6 +107,7 @@ const RegistrationPage = () => {
 
     return (
         <Container component="main">
+            <ToastContainer position="top-center" />
             <FormContainer>
                 <Typography component="h1" variant="h4" align="center" marginY="4rem">
                     Login or Register

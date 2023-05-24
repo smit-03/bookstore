@@ -22,10 +22,10 @@ request.interceptors.request.use(
         if (config.headers) {
             config.headers["Content-Type"] = "application/json";
         }
-        if (config.headers["isDisableLoader"] !== true) {
-            requests.push(config.url);
-            showLoader();
-        }
+        // if (config.headers["isDisableLoader"] !== true) {
+        //     requests.push(config.url);
+        //     showLoader();
+        // }
         return config;
     },
     (error) => {
