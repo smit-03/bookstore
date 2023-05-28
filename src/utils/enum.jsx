@@ -5,6 +5,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import About from "../pages/About";
 import Contact from "../pages/Contact";
+import Error from "../pages/Error/index";
 
 export const RoutePaths = {
   home: "/",
@@ -23,6 +24,7 @@ const MenuRoutePaths = () => {
         <Route exact path={RoutePaths.register} element={<Register />} />
         <Route exact path={RoutePaths.about} element={<About />} />
         <Route exact path={RoutePaths.contact} element={<Contact />} />
+        <Route path="*" element={<Error />} />
       </Routes>
     </>
   );

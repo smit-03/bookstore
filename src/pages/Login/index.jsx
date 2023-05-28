@@ -1,19 +1,27 @@
-import React from "react";
-import { Container, Breadcrumbs } from "@mui/material";
-import { styled } from "@mui/system";
-import { TextField, Typography, Button } from "@mui/material";
+import React, { useState } from "react";
+import { Container } from "@mui/material";
+import { TextField, Typography } from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import authService from "../../service/auth.service";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
-import { RoutePaths } from "../../Components/MenuRoutePaths";
+import { RoutePaths } from "../../utils/enum";
+import {
+  LogFormContainer,
+  BreadcrumbsContainer,
+  MainContainer,
+  InfoContainer,
+  SectionTitle,
+  RegLogButton,
+  StyledCircularProgress,
+} from "../../style";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
   password: Yup.string()
     .required("Password is required")
-    .min(4, "Password must be at least 4 characters long"),
+    .min(5, "Password must be at least 5 characters long"),
 });
 
 const initialValues = {
@@ -21,78 +29,37 @@ const initialValues = {
   password: "",
 };
 
-const MainContainer = styled("div")`
-  display: flex;
-  flex-direction: row;
-  margin: 2rem;
-  justify-content: space-between;
-`;
-
-const FormContainer = styled("div")`
-  display: flex;
-  flex-direction: column;
-  margin: 2rem;
-  flex: 1;
-  width: 100%;
-`;
-
-const InfoContainer = styled("div")`
-  display: flex;
-  flex-direction: column;
-  margin: 2rem;
-  font-size: 18px;
-  flex: 1;
-  width: 100%;
-`;
-
-const SectionTitle = styled("h2")`
-  margin-bottom: 2.5rem;
-  font-weight: 400;
-  position: relative;
-  font-size: 2vw;
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -13px;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-`;
-const LoginButton = styled(Button)`
-  align-self: flex-start;
-  margin-top: auto;
-  background-color: red;
-`;
-
-const BreadcrumbsContainer = styled(Breadcrumbs)`
-  margin: auto;
-  margin-right: 35vw;
-  display: flex;
-  align-items: center;
-`;
-
 const Login = () => {
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = (data) => {
     console.log(data);
     delete data.id;
+
+    setLoading(true); // Set loading to true on form submission
 
     authService
       .login(data)
       .then(() => {
         console.log("Logged In!!");
-        toast.success("Successfully Loged In");
+        toast.success("Successfully Logged In");
       })
       .catch(() => {
         toast.error();
+      })
+      .finally(() => {
+        setLoading(false); // Reset loading to false after API call is complete
       });
   };
 
   return (
     <Container component="main">
-      <FormContainer>
-        <BreadcrumbsContainer separator="›" aria-label="breadcrumb">
+      <LogFormContainer>
+        <BreadcrumbsContainer
+          separator="›"
+          aria-label="breadcrumb"
+          style={{ marginRight: "35.56vw" }}
+        >
           <Typography color="textPrimary">Login</Typography>
           <Link
             to={RoutePaths.register}
@@ -105,7 +72,7 @@ const Login = () => {
           <InfoContainer>
             <SectionTitle>New Customer</SectionTitle>
             <div>
-              <Link to={RoutePaths.register} style={{ textDecoration: "none" }}>
+              <Link to={RoutePaths.register} style={{ color: "red" }}>
                 Registration is free and easy
               </Link>
             </div>
@@ -116,16 +83,21 @@ const Login = () => {
                 <li>view and track orders and more</li>
               </ul>
             </div>
-            <LoginButton variant="contained" color="primary">
+            <RegLogButton
+              variant="contained"
+              color="secondary"
+              style={{ marginTop: "auto" }}
+              disabled={loading}
+            >
               <Link
                 to={RoutePaths.register}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
                 Create New Account
               </Link>
-            </LoginButton>
+            </RegLogButton>
           </InfoContainer>
-          <FormContainer>
+          <LogFormContainer>
             <SectionTitle>Registered Customer</SectionTitle>
             <div style={{ marginBottom: "1rem", fontSize: "18px" }}>
               <span>If you have an account with us, please login</span>
@@ -160,19 +132,22 @@ const Login = () => {
                     error={touched.password && !!errors.password}
                     helperText={touched.password && errors.password}
                   />
-                  <LoginButton
+                  <RegLogButton
                     type="submit"
                     variant="contained"
-                    color="primary"
+                    color="secondary"
+                    style={{ marginTop: "auto" }}
+                    disabled={loading}
                   >
+                    {loading && <StyledCircularProgress size={20} />}
                     Login
-                  </LoginButton>
+                  </RegLogButton>
                 </Form>
               )}
             </Formik>
-          </FormContainer>
+          </LogFormContainer>
         </MainContainer>
-      </FormContainer>
+      </LogFormContainer>
     </Container>
   );
 };

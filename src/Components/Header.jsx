@@ -1,184 +1,153 @@
-import React, { useState } from "react";
-import { styled } from "@mui/system";
+import React, { useState, useEffect, useRef } from "react";
 import {
   AppBar,
   Toolbar,
-  Typography,
   IconButton,
-  Button,
   useMediaQuery,
-  Menu,
-  MenuItem,
+  useTheme,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { Link } from "react-router-dom";
-
-const HeaderContainer = styled("div")`
-  background-color: red;
-  color: white;
-  display: flex;
-  align-items: center;
-`;
-
-const Title = styled(Typography)`
-  font-weight: bold;
-  margin-right: 3vw;
-`;
-
-const NavigationLinksContainer = styled("div")`
-  justify-content: left;
-`;
-
-const NavigationButton = styled(Button)`
-  && {
-    margin-right: 8px;
-  }
-`;
-
-const SearchForm = styled("form")`
-  display: flex;
-  align-items: center;
-  background-color: white;
-  border-radius: 4px;
-  padding: 3px;
-  margin-left: auto;
-  width: 35%;
-
-  & input {
-    border: none;
-    outline: none;
-    flex-grow: 1;
-    padding: 8px;
-    font-size: 16px;
-  }
-`;
-
-const SearchButton = styled(IconButton)`
-  && {
-    color: black;
-    padding: 8px;
-    border-radius: 0;
-    &:hover {
-      background-color: #f9545454;
-    }
-  }
-`;
-
-const SigninButton = styled(Button)`
-  background-color: white;
-  color: black;
-  margin-left: 1vw;
-  text-transform: capitalize;
-  font-family: "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji";
-  :hover {
-    background-color: wheat;
-  }
-`;
+import { RoutePaths } from "../utils/enum";
+import { SearchBar, SearchResultsList } from "./searchBar/searchBar";
+import { searchBook } from "../service/book.service";
+import NavDropdown from "./NavDropdown";
+import NavigationLinks from "./NavigationLinks";
+import {
+  HeaderContainer,
+  Title,
+  SigninButton,
+  CounteItem,
+  ResultContainer,
+} from "./HeaderStyle";
 
 const Header = () => {
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const [input, setInput] = useState("");
+  const resultsListRef = useRef(null);
+
+  useEffect(() => {
+    if (input.trim() === "") {
+      setShowResults(false);
+      setSearchResults([]);
+    }
+  }, [input]);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (
+        resultsListRef.current &&
+        !resultsListRef.current.contains(event.target)
+      ) {
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener("click", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, []);
+
+  const handleSearch = async (value) => {
+    setInput(value);
+    if (value.trim() !== "") {
+      setShowResults(true);
+      await searchBook(value)
+        .then((res) => {
+          setSearchResults(res);
+        })
+        .catch((error) => {
+          console.error("Error searching for books:", error);
+        });
+    } else {
+      setShowResults(false);
+      setSearchResults([]);
+    }
+  };
+
   const isTabletOrSmaller = useMediaQuery((theme) =>
-    theme.breakpoints.down("sm")
+    theme.breakpoints.down("md")
   );
-  const [anchorEl, setAnchorEl] = useState(null);
+  const theme = useTheme();
+  const [anchorSrp, setAnchorSrp] = useState(null);
 
   const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
+    setAnchorSrp(event.currentTarget);
   };
 
   const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const renderNavigationLinks = () => {
-    return (
-      <NavigationLinksContainer>
-        <NavigationButton color="inherit" component={Link} to="/">
-          Home
-        </NavigationButton>
-        <NavigationButton color="inherit" component={Link} to="/about">
-          About
-        </NavigationButton>
-        <NavigationButton color="inherit" component={Link} to="/contact">
-          Contact
-        </NavigationButton>
-      </NavigationLinksContainer>
-    );
-  };
-
-  const renderDropdownMenu = () => {
-    return (
-      <>
-        <IconButton
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-          aria-controls="dropdown-menu"
-          aria-haspopup="true"
-          onClick={handleMenuOpen}
-        >
-          <MenuIcon />
-        </IconButton>
-        <Menu
-          id="dropdown-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "left",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "left",
-          }}
-        >
-          <MenuItem component={Link} to="/" onClick={handleMenuClose}>
-            Home
-          </MenuItem>
-          <MenuItem component={Link} to="/about" onClick={handleMenuClose}>
-            About
-          </MenuItem>
-          <MenuItem component={Link} to="/contact" onClick={handleMenuClose}>
-            Contact
-          </MenuItem>
-        </Menu>
-      </>
-    );
+    setAnchorSrp(null);
   };
 
   return (
-    <HeaderContainer>
-      <AppBar position="static">
-        <Toolbar>
-          {isTabletOrSmaller ? renderDropdownMenu() : null}
-          <Title variant="h6">myBooks</Title>
-          {!isTabletOrSmaller && renderNavigationLinks()}
-          <SearchForm name="searchForm">
-            <input
-              type="text"
-              placeholder="What are you Looking for??"
-              aria-label="Search"
-            />
-            <SearchButton type="submit" color="inherit" aria-label="search">
-              <SearchIcon />
-            </SearchButton>
-          </SearchForm>
-          <SigninButton variant="outlined" component={Link} to="/register">
-            Sign In
-          </SigninButton>
-          <IconButton
-            color="inherit"
-            aria-label="cart"
-            style={{ marginLeft: "0.5vw" }}
-          >
-            <ShoppingCartIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-    </HeaderContainer>
+    <>
+      <HeaderContainer>
+        <AppBar position="static">
+          <Toolbar>
+            {/* MenuIcon */}
+            {isTabletOrSmaller ? (
+              <NavDropdown
+                anchorEl={anchorSrp}
+                handleMenuOpen={handleMenuOpen}
+                handleMenuClose={handleMenuClose}
+              />
+            ) : null}
+
+            <Title variant="h6">myBooks</Title>
+
+            {/* Navlinks */}
+            {!isTabletOrSmaller && <NavigationLinks />}
+
+            {/* Searchbar */}
+            <SearchBar onSearch={handleSearch} setInput={setInput} />
+
+            {/* SignIn button/Icon */}
+            {isTabletOrSmaller ? (
+              <PersonAddIcon
+                style={{
+                  border: "2px solid white",
+                  borderRadius: "50%",
+                  marginLeft: theme.spacing(1),
+                  padding: "5px",
+                }}
+              >
+                <Link to={RoutePaths.register}></Link>
+              </PersonAddIcon>
+            ) : (
+              <SigninButton
+                variant="outlined"
+                component={Link}
+                to={RoutePaths.register}
+              >
+                Sign In
+              </SigninButton>
+            )}
+
+            {/* CartIcon */}
+            <IconButton
+              color="inherit"
+              aria-label="cart"
+              style={{
+                marginLeft: theme.spacing(2),
+                height: "5vh",
+              }}
+            >
+              <ShoppingCartIcon />
+              <CounteItem>0</CounteItem>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+      </HeaderContainer>
+      {showResults && searchResults && (
+        <ResultContainer ref={resultsListRef}>
+          <SearchResultsList results={searchResults} />
+        </ResultContainer>
+      )}
+    </>
   );
 };
 

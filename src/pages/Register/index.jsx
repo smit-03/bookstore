@@ -1,19 +1,19 @@
-import React from "react";
-import { styled } from "@mui/system";
-import {
-  TextField,
-  Button,
-  Typography,
-  Container,
-  MenuItem,
-  Breadcrumbs,
-} from "@mui/material";
+import React, { useState } from "react";
+import { TextField, Typography, Container, MenuItem } from "@mui/material";
 import { Link } from "react-router-dom";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import authService from "../../service/auth.service";
 import { toast } from "react-toastify";
-import { RoutePaths } from "../../Components/MenuRoutePaths";
+import { RoutePaths } from "../../utils/enum";
+import {
+  RegFormContainer,
+  FieldWrapper,
+  BreadcrumbsContainer,
+  SectionTitle,
+  RegLogButton,
+  StyledCircularProgress,
+} from "../../style";
 
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required("First Name is required"),
@@ -22,7 +22,7 @@ const validationSchema = Yup.object().shape({
   roleId: Yup.number().required("Role is required"),
   password: Yup.string()
     .required("Password is required")
-    .min(4, "Password must be at least 4 characters long"),
+    .min(5, "Password must be at least 5 characters long"),
   confirmPassword: Yup.string()
     .required("Confirm Password is required")
     .oneOf([Yup.ref("password"), null], "Passwords must match"),
@@ -37,68 +37,15 @@ const initialValues = {
   confirmPassword: "",
 };
 
-//makeStyles is not compatible with 'react-18'. Can use styled compo. instead
-/* const useStyles = makeStyles((theme) => ({
-    root: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        marginTop: theme.spacing(4),
-    },
-    form: {
-        width: '100%',
-        : theme.spacing(2),
-    },
-    submitButton: {
-        margin: theme.spacing(3, 0, 2),
-    },
-})); */
-
-const FormContainer = styled("div")`
-  display: flex;
-  flex-direction: column;
-  margin: 2rem;
-`;
-
-const SectionTitle = styled("h2")`
-  margin-bottom: 2.5rem;
-  font-weight: 400;
-  position: relative;
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -13px;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const FieldWrapper = styled("div")`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-`;
-
-const BreadcrumbsContainer = styled(Breadcrumbs)`
-  margin: auto;
-  display: flex;
-  align-items: center;
-`;
-
-const RegisterButton = styled(Button)`
-  align-self: flex-start;
-  margin-top: 2rem;
-  background-color: red;
-`;
-
 const Register = () => {
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = (data) => {
     console.log(data);
-    // data.roleId === 1 ? data.role = "Buyer" : data.role = "Seller";
     delete data.id;
     delete data.confirmPassword;
+
+    setLoading(true); // Set loading to true on form submission
 
     authService
       .create(data)
@@ -108,19 +55,15 @@ const Register = () => {
       })
       .catch(() => {
         toast.error();
+      })
+      .finally(() => {
+        setLoading(false); // Reset loading to false after API call is complete
       });
   };
 
-  // We can use 'useFormik' Hook instead of <Formik> comp. of 'formik'
-  /* const formik = useFormik({
-        initialValues,
-        validationSchema,
-        onSubmit: handleSubmit,
-    }); */
-
   return (
     <Container component="main">
-      <FormContainer>
+      <RegFormContainer>
         <BreadcrumbsContainer separator="›" aria-label="breadcrumb">
           <Link
             to={RoutePaths.login}
@@ -217,17 +160,24 @@ const Register = () => {
                 />
               </FieldWrapper>
               <div>
-                <Link to={RoutePaths.login} style={{ textDecoration: "none" }}>
+                <Link to={RoutePaths.login} style={{ color: "red" }}>
                   Already have an account??
                 </Link>
               </div>
-              <RegisterButton type="submit" variant="contained" color="success">
+              <RegLogButton
+                type="submit"
+                variant="contained"
+                color="secondary"
+                style={{ marginTop: "2rem" }}
+                disabled={loading}
+              >
+                {loading && <StyledCircularProgress size={20} />}
                 Register
-              </RegisterButton>
+              </RegLogButton>
             </Form>
           )}
         </Formik>
-      </FormContainer>
+      </RegFormContainer>
     </Container>
   );
 };
