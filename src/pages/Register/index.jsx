@@ -129,8 +129,8 @@ const Register = () => {
                   error={touched.roleId && !!errors.roleId}
                   helperText={touched.roleId && errors.roleId}
                 >
-                  <MenuItem value={1}>Buyer</MenuItem>
                   <MenuItem value={2}>Seller</MenuItem>
+                  <MenuItem value={3}>Buyer</MenuItem>
                 </Field>
               </FieldWrapper>
 

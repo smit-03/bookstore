@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container } from "@mui/material";
 import { TextField, Typography } from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import authService from "../../service/auth.service";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { RoutePaths } from "../../utils/enum";
 import {
   LogFormContainer,
@@ -16,6 +16,7 @@ import {
   RegLogButton,
   StyledCircularProgress,
 } from "../../style";
+import { useAuthContext } from "../../service/auth.context";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -30,25 +31,35 @@ const initialValues = {
 };
 
 const Login = () => {
+  const authContext = useAuthContext();
+  const navigate = useNavigate();
+  // useEffect(() => {
+  //   if (authContext.user.id) {
+  //     navigate(RoutePaths.home);
+  //   }
+  // }, [authContext.user]);
+
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = (data) => {
     console.log(data);
     delete data.id;
 
-    setLoading(true); // Set loading to true on form submission
+    setLoading(true);
 
     authService
       .login(data)
-      .then(() => {
+      .then((res) => {
         console.log("Logged In!!");
         toast.success("Successfully Logged In");
+        authContext.setUser(res);
+        navigate(RoutePaths.home);
       })
-      .catch(() => {
+      .catch((error) => {
         toast.error();
       })
       .finally(() => {
-        setLoading(false); // Reset loading to false after API call is complete
+        setLoading(false);
       });
   };
 

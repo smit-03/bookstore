@@ -107,16 +107,17 @@ const Header = () => {
 
             {/* SignIn button/Icon */}
             {isTabletOrSmaller ? (
-              <PersonAddIcon
-                style={{
-                  border: "2px solid white",
-                  borderRadius: "50%",
-                  marginLeft: theme.spacing(1),
-                  padding: "5px",
-                }}
-              >
-                <Link to={RoutePaths.register}></Link>
-              </PersonAddIcon>
+              <Link to={RoutePaths.register}>
+                <PersonAddIcon
+                  style={{
+                    border: "2px solid white",
+                    borderRadius: "50%",
+                    marginLeft: theme.spacing(1),
+                    padding: "5px",
+                    color: "white",
+                  }}
+                />
+              </Link>
             ) : (
               <SigninButton
                 variant="outlined"
