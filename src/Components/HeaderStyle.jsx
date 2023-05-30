@@ -16,16 +16,16 @@ export const HeaderContainer = styled("header")`
 
 export const Title = styled(Typography)`
   font-weight: bold;
-  margin-right: 3vw;
+  margin-right: 1.5vw;
 `;
 
-export const SigninButton = styled(Button)`
+export const SLOButton = styled(Button)`
   background-color: white;
   color: black;
   margin-left: 1vw;
   text-transform: capitalize;
-  font-family: "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji";
+  font-family: "Apple Color Emoji", "Segoe UI Emoji";
+  font-weight: 600;
   :hover {
     background-color: wheat;
   }
@@ -48,8 +48,4 @@ export const NavigationLinksContainer = styled("div")`
   justify-content: left;
 `;
 
-export const NavigationButton = styled(Button)`
-  && {
-    margin-right: 8px;
-  }
-`;
+export const NavigationButton = styled(Button)``;

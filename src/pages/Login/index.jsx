@@ -16,7 +16,7 @@ import {
   RegLogButton,
   StyledCircularProgress,
 } from "../../style";
-import { useAuthContext } from "../../service/auth.context";
+import { useAuthContext } from "../../context/auth.context";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),

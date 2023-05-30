@@ -27,7 +27,7 @@ const NavigationItems = [
     },
 ];
 
-const hasAccess = ({ pathname, user }) => {
+const hasAccess = (pathname, user) => {
     console.log(pathname);
     console.log(user);
     const navItem = NavigationItems.find((navItem) =>

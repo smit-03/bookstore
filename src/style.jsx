@@ -79,7 +79,7 @@ export const BookCard = styled(Paper)`
 
 export const BookImage = styled("img")`
   width: 100%;
-  height: 20vh;
+  height: 15vh;
   object-fit: cover;
   border-radius: 8px;
   object-fit: contain;

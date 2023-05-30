@@ -42,9 +42,10 @@ export const AuthWrapper = ({ children }) => {
         const cache = JSON.parse(localStorage.getItem(shared.localStorageKeys.USER)) || initialUserValue;
         if (cache.id) {
             _setUser(cache);
-        } else {
-            navigate(RoutePaths.login);
         }
+        // else {
+        //     navigate(RoutePaths.login);
+        // }
     }, []);
 
     useEffect(() => {
@@ -54,7 +55,7 @@ export const AuthWrapper = ({ children }) => {
         if (!user.id) {
             return;
         }
-        const access = shared.hasAccess({ pathname, user });
+        const access = shared.hasAccess(pathname, user);
         if (!access) {
             toast.warning("Sorry, you are not authorized to access this page");
             navigate(RoutePaths.home);

@@ -6,8 +6,10 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from "react-router-dom";
 import { RoutePaths } from "../utils/enum";
 import { SearchBar, SearchResultsList } from "./searchBar/searchBar";
@@ -17,16 +19,27 @@ import NavigationLinks from "./NavigationLinks";
 import {
   HeaderContainer,
   Title,
-  SigninButton,
+  SLOButton,
   CounteItem,
   ResultContainer,
 } from "./HeaderStyle";
+import { useAuthContext } from "../context/auth.context";
+// import { CartContext } from "../context/cart.context";
+// import { useContext } from "react";
 
 const Header = () => {
+  const authContext = useAuthContext();
+  // const { cartItems } = useContext(CartContext);
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const [input, setInput] = useState("");
   const resultsListRef = useRef(null);
+
+  const [authContextUpdated, setAuthContextUpdated] = useState(false);
+
+  useEffect(() => {
+    setAuthContextUpdated((prevState) => !prevState);
+  }, [authContext]);
 
   useEffect(() => {
     if (input.trim() === "") {
@@ -98,15 +111,45 @@ const Header = () => {
             ) : null}
 
             <Title variant="h6">myBooks</Title>
+            {/* Home Icon */}
+
+            <Link to={RoutePaths.home}>
+              <HomeRoundedIcon
+                style={{
+                  fontSize: "2.2rem",
+                  marginRight: "1.8rem",
+                  color: "white",
+                }}
+              />
+            </Link>
 
             {/* Navlinks */}
-            {!isTabletOrSmaller && <NavigationLinks />}
+            {!isTabletOrSmaller && <NavigationLinks key={authContextUpdated} />}
 
             {/* Searchbar */}
             <SearchBar onSearch={handleSearch} setInput={setInput} />
 
-            {/* SignIn button/Icon */}
-            {isTabletOrSmaller ? (
+            {/* SignIn/Logout-button/Icon */}
+            {authContext.user.id ? (
+              isTabletOrSmaller ? (
+                <IconButton onClick={authContext.signOut}>
+                  <LogoutIcon
+                    onClick
+                    style={{
+                      border: "2px solid white",
+                      borderRadius: "50%",
+                      marginLeft: theme.spacing(1),
+                      padding: "5px",
+                      color: "white",
+                    }}
+                  />
+                </IconButton>
+              ) : (
+                <SLOButton variant="outlined" onClick={authContext.signOut}>
+                  Logout
+                </SLOButton>
+              )
+            ) : isTabletOrSmaller ? (
               <Link to={RoutePaths.register}>
                 <PersonAddIcon
                   style={{
@@ -119,13 +162,13 @@ const Header = () => {
                 />
               </Link>
             ) : (
-              <SigninButton
+              <SLOButton
                 variant="outlined"
                 component={Link}
                 to={RoutePaths.register}
               >
                 Sign In
-              </SigninButton>
+              </SLOButton>
             )}
 
             {/* CartIcon */}
@@ -138,7 +181,7 @@ const Header = () => {
               }}
             >
               <ShoppingCartIcon />
-              <CounteItem>0</CounteItem>
+              <CounteItem>{/* {cartItems.length} */}0</CounteItem>
             </IconButton>
           </Toolbar>
         </AppBar>

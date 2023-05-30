@@ -8,13 +8,15 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { theme } from "./utils/theme";
 import Footer from "./Components/Footer";
-import { AuthWrapper } from "./service/auth.context";
+import { AuthWrapper } from "./context/auth.context";
+// import { CartProvider } from "./context/cart.context";
 
 const App = () => {
   return (
     <>
       <BrowserRouter>
         <AuthWrapper>
+          {/* <CartProvider> */}
           <ThemeProvider theme={theme}>
             <ToastContainer />
             <Header />
@@ -23,6 +25,7 @@ const App = () => {
             </PageContainer>
             <Footer />
           </ThemeProvider>
+          {/* </CartProvider> */}
         </AuthWrapper>
       </BrowserRouter>
     </>

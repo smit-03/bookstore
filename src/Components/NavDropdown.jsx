@@ -1,10 +1,19 @@
-import React from "react";
+import { React, useMemo } from "react";
 import { Menu, MenuItem, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Link } from "react-router-dom";
+import { Link, Route } from "react-router-dom";
 import { RoutePaths } from "../utils/enum";
+import { useAuthContext } from "../context/auth.context";
+import shared from "../utils/shared";
 
 const NavDropdown = ({ anchorEl, handleMenuOpen, handleMenuClose }) => {
+  const authContext = useAuthContext();
+  const items = useMemo(() => {
+    return shared.NavigationItems.filter(
+      (item) =>
+        !item.access.length || item.access.includes(authContext.user.roleId)
+    );
+  }, []);
   return (
     <>
       <IconButton
@@ -31,13 +40,20 @@ const NavDropdown = ({ anchorEl, handleMenuOpen, handleMenuClose }) => {
           horizontal: "left",
         }}
       >
-        <MenuItem
-          component={Link}
-          to={RoutePaths.home}
-          onClick={handleMenuClose}
-        >
-          Home
-        </MenuItem>
+        {!authContext.user.id && (
+          <MenuItem
+            component={Link}
+            to={RoutePaths.login}
+            onClick={handleMenuClose}
+          >
+            Login
+          </MenuItem>
+        )}
+        {items.map((item) => (
+          <MenuItem component={Link} to={item.route} onClick={handleMenuClose}>
+            {item.name}
+          </MenuItem>
+        ))}
         <MenuItem
           component={Link}
           to={RoutePaths.about}

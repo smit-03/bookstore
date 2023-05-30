@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Button, CircularProgress, Grid } from "@mui/material";
 import { getAllBooks } from "../../service/book.service";
 import {
@@ -8,8 +8,41 @@ import {
   BookSub,
   GridContainer,
 } from "../../style";
+import BookDetailsOverlay from "./BookDetailsOverlay";
+// import { CartContext } from "../../service/cart.context";
+import { useAuthContext } from "../../context/auth.context";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { RoutePaths } from "../../utils/enum";
 
 const BookGrid = () => {
+  const authContext = useAuthContext();
+  // const { addToCart, updateCartItemQuantity, cartItems } =
+  //   useContext(CartContext);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const navigate = useNavigate();
+
+  const openBookDetails = (book) => {
+    setSelectedBook(book);
+  };
+
+  const closeBookDetails = () => {
+    setSelectedBook(null);
+  };
+
+  // const handleAddToCart = (book) => {
+  //   if (authContext.user.id) {
+  //     addToCart(book);
+  //   } else {
+  //     toast.warning("Please Login to add book in cart");
+  //     navigate(RoutePaths.login);
+  //   }
+  // };
+
+  // const handleRemoveFromCart = (book) => {
+  //   updateCartItemQuantity(book, 0);
+  // };
+
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,28 +80,64 @@ const BookGrid = () => {
   return (
     <GridContainer>
       <Grid container spacing={2} className="book-grid">
-        {books.map((book) => (
-          <Grid item xs={4} sm={3} md={2} key={book.id} marginBottom="2vh">
-            <BookCard elevation={3}>
-              <BookImage
-                src={book.base64image}
-                alt={book.name}
-                className="book-image"
-              />
-              <BookName variant="h6" style={{ fontSize: "1rem" }}>
-                {book.name}
-              </BookName>
-              <BookSub variant="subtitle1">
-                {book.description.slice(0, 30)}
-              </BookSub>
-              <BookSub variant="subtitle1">Rs. {book.price}</BookSub>
-              <Button variant="contained" color="primary">
-                Add to Cart
-              </Button>
-            </BookCard>
-          </Grid>
-        ))}
+        {books.map((book) => {
+          {
+            /* const isInCart = cartItems.some((item) => item.id === book.id); */
+          }
+          return (
+            <Grid
+              item
+              xs={4}
+              sm={3}
+              md={2}
+              key={book.id}
+              marginBottom="2vh"
+              onClick={() => openBookDetails(book)}
+              style={{ cursor: "pointer" }}
+            >
+              <BookCard elevation={3}>
+                <BookImage
+                  src={book.base64image}
+                  alt={book.name}
+                  className="book-image"
+                />
+                <BookName variant="h6" style={{ fontSize: "1rem" }}>
+                  {book.name}
+                </BookName>
+                <BookSub variant="subtitle1">Rs. {book.price}</BookSub>
+                {/* {isInCart ? ( */}
+                {/* <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    style={{ textTransform: "capitalize" }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveFromCart(book);
+                    }}
+                  >
+                    Remove
+                  </Button>
+                ) : ( */}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  style={{ textTransform: "capitalize" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // handleAddToCart(book);
+                  }}
+                >
+                  Add to Cart
+                </Button>
+                {/* )} */}
+              </BookCard>
+            </Grid>
+          );
+        })}
       </Grid>
+      <BookDetailsOverlay book={selectedBook} onClose={closeBookDetails} />
     </GridContainer>
   );
 };
