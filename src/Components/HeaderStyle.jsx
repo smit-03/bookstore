@@ -48,4 +48,6 @@ export const NavigationLinksContainer = styled("div")`
   justify-content: left;
 `;
 
-export const NavigationButton = styled(Button)``;
+export const NavigationButton = styled(Button)`
+  text-transform: capitalize;
+`;

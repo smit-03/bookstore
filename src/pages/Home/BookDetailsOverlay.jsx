@@ -28,6 +28,8 @@ const BookDetailsOverlay = ({ book, onClose }) => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          maxWidth: "30vw",
+          overflow: "hidden",
         },
       }}
       sx={{
@@ -54,7 +56,7 @@ const BookDetailsOverlay = ({ book, onClose }) => {
             alignItems: "center",
           }}
         >
-          <div style={{ heigh: "10%", width: "20%" }}>
+          <div style={{ heigh: "18%", width: "35%" }}>
             <img
               src={base64image}
               alt={name}

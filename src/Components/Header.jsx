@@ -134,7 +134,6 @@ const Header = () => {
               isTabletOrSmaller ? (
                 <IconButton onClick={authContext.signOut}>
                   <LogoutIcon
-                    onClick
                     style={{
                       border: "2px solid white",
                       borderRadius: "50%",

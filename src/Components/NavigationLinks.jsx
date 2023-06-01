@@ -23,7 +23,6 @@ const NavigationLinks = () => {
           style={{
             fontSize: "1rem",
             fontFamily: "Georgia, serif",
-            textTransform: "capitalize",
           }}
         >
           Login

@@ -21,7 +21,7 @@ const NavigationItems = [
         access: [Role.Admin, Role.Seller],
     },
     {
-        name: "Update Profile",
+        name: "UpdateProfile",
         route: RoutePaths.updateprofile,
         access: [Role.Admin, Role.Seller, Role.Buyer],
     },

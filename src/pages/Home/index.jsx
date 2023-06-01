@@ -1,26 +1,33 @@
-import React, { useEffect, useState, useContext } from "react";
-import { Button, CircularProgress, Grid } from "@mui/material";
-import { getAllBooks } from "../../service/book.service";
+import React, { useState, useEffect } from "react";
 import {
-  BookCard,
-  BookImage,
-  BookName,
-  BookSub,
-  GridContainer,
-} from "../../style";
+  Container,
+  Typography,
+  Grid,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  CircularProgress,
+  Button,
+  Pagination,
+} from "@mui/material";
+import { BookCard, BookImage, BookName, BookSub } from "../../style";
 import BookDetailsOverlay from "./BookDetailsOverlay";
-// import { CartContext } from "../../service/cart.context";
-import { useAuthContext } from "../../context/auth.context";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-import { RoutePaths } from "../../utils/enum";
+import {
+  getAllPaginatedBooks,
+  getAllBooksOfKeyword,
+} from "../../service/book.service";
 
-const BookGrid = () => {
-  const authContext = useAuthContext();
-  // const { addToCart, updateCartItemQuantity, cartItems } =
-  //   useContext(CartContext);
+const BookListing = () => {
+  const [books, setBooks] = useState([]);
+  const [pageSize, setPageSize] = useState(5);
+  const [keyword, setKeyword] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
   const [selectedBook, setSelectedBook] = useState(null);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const openBookDetails = (book) => {
     setSelectedBook(book);
@@ -30,37 +37,72 @@ const BookGrid = () => {
     setSelectedBook(null);
   };
 
-  // const handleAddToCart = (book) => {
-  //   if (authContext.user.id) {
-  //     addToCart(book);
-  //   } else {
-  //     toast.warning("Please Login to add book in cart");
-  //     navigate(RoutePaths.login);
-  //   }
-  // };
+  const [sortedBooks, setSortedBooks] = useState([]);
 
-  // const handleRemoveFromCart = (book) => {
-  //   updateCartItemQuantity(book, 0);
-  // };
-
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [debouncedKeyword, setDebouncedKeyword] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
+    const delay = setTimeout(() => {
+      setDebouncedKeyword(keyword);
+    }, 1000);
+
+    return () => {
+      clearTimeout(delay);
+    };
+  }, [keyword]);
+
+  useEffect(() => {
+    const loadBooks = async () => {
+      setLoading(true);
       try {
-        const response = await getAllBooks();
-        setBooks(response);
-        setLoading(false);
+        let response;
+        if (!debouncedKeyword || debouncedKeyword === "") {
+          response = await getAllPaginatedBooks(pageSize, currentPage);
+        } else {
+          response = await getAllBooksOfKeyword(
+            pageSize,
+            currentPage,
+            debouncedKeyword
+          );
+        }
+        const { items, totalItems } = response;
+        setBooks(items);
+        setTotalCount(totalItems);
       } catch (error) {
-        console.error("Error getting books:", error);
+        console.error("Error loading books:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    if (books.length === 0) {
-      fetchData();
-    }
-  }, [books]);
+    loadBooks();
+  }, [pageSize, currentPage, debouncedKeyword]);
+
+  useEffect(() => {
+    sortBooks();
+  }, [sortOrder, books]);
+
+  const sortBooks = () => {
+    const sortedBooks = [...books];
+    sortedBooks.sort((a, b) => {
+      return sortOrder === "asc"
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
+    });
+    setSortedBooks(sortedBooks);
+  };
+
+  const handleSearchChange = (event) => {
+    setKeyword(event.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleSortOrder = (e) => {
+    setSortOrder(e.target.value);
+  };
+  const handlePageChange = async (event, page) => {
+    setCurrentPage(page);
+  };
 
   if (loading) {
     return (
@@ -78,68 +120,91 @@ const BookGrid = () => {
   }
 
   return (
-    <GridContainer>
-      <Grid container spacing={2} className="book-grid">
-        {books.map((book) => {
-          {
-            /* const isInCart = cartItems.some((item) => item.id === book.id); */
-          }
-          return (
-            <Grid
-              item
-              xs={4}
-              sm={3}
-              md={2}
-              key={book.id}
-              marginBottom="2vh"
-              onClick={() => openBookDetails(book)}
-              style={{ cursor: "pointer" }}
+    <Container>
+      <Typography variant="h4">Book Listing</Typography>
+      <Grid container className="name-wrapper">
+        <Grid item xs={6}>
+          <Typography variant="h6">
+            Total<span> - {totalCount} items</span>
+          </Typography>
+        </Grid>
+        <Grid item className="dropdown-wrapper">
+          <FormControl fullWidth>
+            <TextField
+              id="text"
+              name="text"
+              placeholder="Search..."
+              type="text"
+              variant="outlined"
+              size="small"
+              value={keyword}
+              onChange={handleSearchChange}
+            />
+          </FormControl>
+        </Grid>
+        <Grid item className="dropdown-wrapper">
+          <FormControl>
+            <InputLabel id="sort-order-label">Sort Order</InputLabel>
+            <Select
+              labelId="sort-order-label"
+              id="sort-order"
+              value={sortOrder}
+              onChange={handleSortOrder}
+              label="Sort Order"
             >
-              <BookCard elevation={3}>
-                <BookImage
-                  src={book.base64image}
-                  alt={book.name}
-                  className="book-image"
-                />
-                <BookName variant="h6" style={{ fontSize: "1rem" }}>
-                  {book.name}
-                </BookName>
-                <BookSub variant="subtitle1">Rs. {book.price}</BookSub>
-                {/* {isInCart ? ( */}
-                {/* <Button
-                    variant="contained"
-                    color="secondary"
-                    size="small"
-                    style={{ textTransform: "capitalize" }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveFromCart(book);
-                    }}
-                  >
-                    Remove
-                  </Button>
-                ) : ( */}
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  style={{ textTransform: "capitalize" }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // handleAddToCart(book);
-                  }}
-                >
-                  Add to Cart
-                </Button>
-                {/* )} */}
-              </BookCard>
-            </Grid>
-          );
-        })}
+              <MenuItem value="asc">a - z</MenuItem>
+              <MenuItem value="desc">z - a</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
       </Grid>
+      <Grid container spacing={2} className="book-grid">
+        {sortedBooks.map((book) => (
+          <Grid
+            item
+            xs={6}
+            sm={4}
+            md={3}
+            key={book.id}
+            marginBottom="2vh"
+            onClick={() => openBookDetails(book)}
+            style={{ cursor: "pointer" }}
+          >
+            <BookCard elevation={3}>
+              <BookImage
+                src={book.base64image}
+                alt={book.name}
+                className="book-image"
+              />
+              <BookName variant="h6" style={{ fontSize: "1rem" }}>
+                {book.name}
+              </BookName>
+              <BookSub variant="subname1">Rs. {book.price}</BookSub>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                style={{ textTransform: "capitalize" }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                Add to Cart
+              </Button>
+            </BookCard>
+          </Grid>
+        ))}
+      </Grid>
+      <Pagination
+        count={Math.ceil(totalCount / pageSize)}
+        page={currentPage}
+        onChange={(event, newPage) => handlePageChange(event, newPage)}
+        color="primary"
+        style={{ marginTop: "2rem" }}
+      />
       <BookDetailsOverlay book={selectedBook} onClose={closeBookDetails} />
-    </GridContainer>
+    </Container>
   );
 };
 
-export default BookGrid;
+export default BookListing;
