@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import {
   Typography,
@@ -19,11 +19,10 @@ import {
   DialogContent,
   DialogActions,
   Box,
-  FormControl,
-  InputLabel,
-  Select,
   MenuItem,
 } from "@mui/material";
+import ImageField from "./ImageField";
+import { FieldWrapper, RegLogButton } from "../../style";
 import { toast } from "react-toastify";
 
 import {
@@ -41,7 +40,7 @@ const validationSchema = Yup.object().shape({
   price: Yup.number().required("Price is required"),
   categoryId: Yup.number().required("Category is required"),
   description: Yup.string().required("Description is required"),
-  base64image: Yup.mixed().required("image is required"),
+  base64image: Yup.mixed().required("Image is required"),
 });
 
 const Book = () => {
@@ -52,9 +51,6 @@ const Book = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [editingBook, setEditingBook] = useState(null);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
-  //   const [selectedImage, setSelectedImage] = useState(
-  //     editingBook?.base64image || null
-  //   );
   const [deleteBookId, setDeleteBookId] = useState(null);
   const [categories, setCategories] = useState([]);
 
@@ -62,7 +58,7 @@ const Book = () => {
     id: editingBook?.id || 0,
     name: editingBook?.name || "",
     price: editingBook?.price || "",
-    categoryId: editingBook?.categoryId || 0,
+    categoryId: editingBook?.categoryId || "",
     description: editingBook?.description || "",
     base64image: editingBook?.base64image || null,
   };
@@ -101,8 +97,8 @@ const Book = () => {
     }
   };
 
-  const handlePageChange = async (event, page) => {
-    setCurrentPage(page);
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage);
   };
 
   const handleSearchChange = (event) => {
@@ -144,38 +140,33 @@ const Book = () => {
       setDeleteConfirmationOpen(false);
       setDeleteBookId(null);
     } catch (error) {
-      console.log(error);
       toast.error("Failed to delete book");
     }
   };
 
-  const handleSaveBook = async (values, { setSubmitting }) => {
+  const handleSaveBook = async (values) => {
+    console.log(values);
     try {
-      setSubmitting(true);
+      delete values.category;
       if (values.id !== 0) {
         await updateBook(values.id, values);
         toast.success("Book updated successfully");
       } else {
-        console.log(values);
         await addBook(values);
         toast.success("Book added successfully");
       }
       fetchBooks();
       setEditingBook(null);
     } catch (error) {
-      console.log(error);
       toast.error("Failed to save book");
-    } finally {
-      setSubmitting(false);
     }
   };
-
   const handleCancelEdit = () => {
     setEditingBook(null);
   };
 
   return (
-    <Box mt={4} mx={2}>
+    <Box mt={4} mx={6}>
       <Typography variant="h4" align="center" mb={4}>
         Book Page
       </Typography>
@@ -203,20 +194,24 @@ const Book = () => {
           <TableHead>
             <TableRow>
               <TableCell>
-                {" "}
-                <strong>Book Name</strong>{" "}
+                <Typography variant="h6" style={{ color: "#1bbb0c" }}>
+                  Book Name
+                </Typography>
               </TableCell>
               <TableCell>
-                {" "}
-                <strong>Price</strong>{" "}
+                <Typography variant="h6" style={{ color: "#1bbb0c" }}>
+                  Price
+                </Typography>
               </TableCell>
               <TableCell>
-                {" "}
-                <strong>Category</strong>
+                <Typography variant="h6" style={{ color: "#1bbb0c" }}>
+                  Category
+                </Typography>
               </TableCell>
               <TableCell>
-                {" "}
-                <strong>Actions</strong>{" "}
+                <Typography variant="h6" style={{ color: "#1bbb0c" }}>
+                  Actions
+                </Typography>
               </TableCell>
             </TableRow>
           </TableHead>
@@ -229,7 +224,7 @@ const Book = () => {
                 <TableCell>
                   <Button
                     variant="outlined"
-                    color="primary"
+                    color="secondary"
                     onClick={() => handleEditBook(book.id)}
                     style={{ marginRight: "8px" }}
                   >
@@ -237,7 +232,7 @@ const Book = () => {
                   </Button>
                   <Button
                     variant="outlined"
-                    color="secondary"
+                    color="primary"
                     onClick={() => handleDeleteConfirmationOpen(book.id)}
                   >
                     Delete
@@ -254,48 +249,59 @@ const Book = () => {
         count={totalBooks}
         rowsPerPage={pageSize}
         page={currentPage}
-        onPageChange={(event, newPage) => handlePageChange(event, newPage)}
-        onRowsPerPageChange={(event) => handlePageSizeChange(event)}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handlePageSizeChange}
         style={{ marginTop: "16px" }}
-        labelDisplayedRows={({ from, to, count }) => {
-          return `${from}-${to} of ${count}`;
-        }}
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}-${to} of ${count}`
+        }
         labelRowsPerPage="Books per page:"
       />
 
       <Dialog open={!!editingBook} onClose={handleCancelEdit}>
-        <DialogTitle>{editingBook ? "Edit Book" : "Add Book"}</DialogTitle>
+        <DialogTitle>Book Form</DialogTitle>
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={handleSaveBook}
         >
-          {({ isSubmitting }) => (
+          {({ errors, touched }) => (
             <Form>
               <DialogContent>
-                <Field
-                  as={TextField}
-                  name="name"
-                  label="Book Name"
-                  variant="outlined"
-                  fullWidth
-                />
-                <ErrorMessage name="name" component="div" />
-                <Field
-                  as={TextField}
-                  name="price"
-                  label="Price"
-                  variant="outlined"
-                  fullWidth
-                />
-                <ErrorMessage name="price" component="div" />
-                <FormControl fullWidth variant="outlined" marginBottom="1rem">
-                  <InputLabel id="category-label">Category</InputLabel>
+                <FieldWrapper>
                   <Field
-                    as={Select}
+                    as={TextField}
+                    variant="outlined"
+                    fullWidth
+                    id="name"
+                    name="name"
+                    label="Book Name"
+                    error={touched.name && !!errors.name}
+                    helperText={touched.name && errors.name}
+                  />
+                  <Field
+                    as={TextField}
+                    variant="outlined"
+                    fullWidth
+                    id="price"
+                    name="price"
+                    label="Price"
+                    error={touched.price && !!errors.price}
+                    helperText={touched.price && errors.price}
+                  />
+                </FieldWrapper>
+
+                <FieldWrapper>
+                  <Field
+                    as={TextField}
+                    variant="outlined"
+                    fullWidth
+                    id="categoryId"
                     name="categoryId"
-                    labelId="category-label"
+                    select
                     label="Category"
+                    error={touched.categoryId && !!errors.categoryId}
+                    helperText={touched.categoryId && errors.categoryId}
                   >
                     {categories.map((category) => (
                       <MenuItem key={category.id} value={category.id}>
@@ -303,40 +309,54 @@ const Book = () => {
                       </MenuItem>
                     ))}
                   </Field>
-                  <ErrorMessage name="categoryId" component="div" />
-                </FormControl>
-                <Field
-                  as={TextField}
-                  name="description"
-                  label="Description"
-                  variant="outlined"
-                  fullWidth
-                  multiline
-                  rows={4}
-                />
-                <ErrorMessage name="description" component="div" />
+                  <ImageField
+                    id="bookimg"
+                    name="base64image"
+                    initialImage={editingBook?.base64image || null}
+                    label="Book Image"
+                    error={touched.base64image && !!errors.base64image}
+                  />
+                </FieldWrapper>
+
+                <FieldWrapper>
+                  <Field
+                    as={TextField}
+                    variant="outlined"
+                    fullWidth
+                    multiline
+                    rows={4}
+                    id="description"
+                    name="description"
+                    label="Description"
+                    error={touched.description && !!errors.description}
+                    helperText={touched.description && errors.description}
+                  />
+                </FieldWrapper>
+
+                <FieldWrapper>
+                  <RegLogButton
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="secondary"
+                  >
+                    Save
+                  </RegLogButton>
+                  <RegLogButton
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    onClick={handleCancelEdit}
+                  >
+                    Cancel
+                  </RegLogButton>
+                </FieldWrapper>
               </DialogContent>
-              <DialogActions>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  disabled={isSubmitting}
-                >
-                  Save
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={handleCancelEdit}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-              </DialogActions>
             </Form>
           )}
         </Formik>
       </Dialog>
+
       <Dialog
         open={deleteConfirmationOpen}
         onClose={handleDeleteConfirmationClose}

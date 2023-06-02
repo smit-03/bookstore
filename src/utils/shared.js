@@ -1,5 +1,14 @@
 import { Role, RoutePaths } from "./enum";
 
+const messages = {
+    USER_DELETE: "are you sure you want to delete the user?",
+    UPDATED_SUCCESS: "Record updated successfully",
+    UPDATED_FAIL: "Record cannot be updated",
+    DELETE_SUCCESS: "Record deleted successfully",
+    DELETE_FAIL: "Record cannot be deleted",
+    ORDER_SUCCESS: "Your order is successfully placed",
+};
+
 const localStorageKeys = {
     USER: "user",
 };
@@ -43,6 +52,7 @@ const hasAccess = (pathname, user) => {
 };
 
 export default {
+    messages,
     hasAccess,
     localStorageKeys,
     NavigationItems,

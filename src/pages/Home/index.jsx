@@ -21,7 +21,7 @@ import {
 
 const BookListing = () => {
   const [books, setBooks] = useState([]);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(8);
   const [keyword, setKeyword] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedBook, setSelectedBook] = useState(null);
