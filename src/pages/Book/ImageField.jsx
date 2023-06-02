@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Box } from "@mui/material";
-import { IconButton, Input } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 
-const ImageField = ({ initialImage, ...props }) => {
+const ImageField = ({ name, initialImage, onImageChange, value, ...props }) => {
   const [image, setImage] = useState(initialImage);
   const [file, setFile] = useState(null);
 
@@ -14,6 +14,7 @@ const ImageField = ({ initialImage, ...props }) => {
     reader.onloadend = () => {
       setFile(selectedFile);
       setImage(reader.result);
+      onImageChange(reader.result);
     };
 
     if (selectedFile) {
@@ -24,6 +25,7 @@ const ImageField = ({ initialImage, ...props }) => {
   const handleImageRemove = () => {
     setFile(null);
     setImage(null);
+    onImageChange(null);
   };
 
   return (
@@ -35,6 +37,7 @@ const ImageField = ({ initialImage, ...props }) => {
             accept="image/*"
             onChange={handleFileChange}
             {...props}
+            name={name}
           />
         </Box>
       )}

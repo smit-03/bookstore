@@ -1,7 +1,6 @@
 import request from "./request";
 
 const ENDPOINT = "api/book";
-const ENDPOINTC = "api/category";
 
 export const searchBook = (searchText) => {
     const url = `${ENDPOINT}/search?keyword=${searchText}`;
@@ -61,12 +60,6 @@ export const deleteBook = (bookId) => {
 
 export const getBookById = (bookId) => {
     const url = `${ENDPOINT}/byId?id=${bookId}`;
-    return request.get(url).then((res) => {
-        return res;
-    });
-};
-export const getAllCategories = () => {
-    const url = `${ENDPOINTC}/all`;
     return request.get(url).then((res) => {
         return res;
     });

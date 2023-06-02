@@ -26,7 +26,6 @@ import { FieldWrapper, RegLogButton } from "../../style";
 import { toast } from "react-toastify";
 
 import {
-  getAllCategories,
   getAllBooksOfKeyword,
   getAllPaginatedBooks,
   getBookById,
@@ -35,12 +34,16 @@ import {
   deleteBook,
 } from "../../service/book.service";
 
+import categoryService from "../../service/category.service";
+
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Book Name is required"),
-  price: Yup.number().required("Price is required"),
-  categoryId: Yup.number().required("Category is required"),
   description: Yup.string().required("Description is required"),
-  base64image: Yup.mixed().required("Image is required"),
+  categoryId: Yup.number()
+    .min(1, "Category is required")
+    .required("Category is required"),
+  price: Yup.number().required("Price is required"),
+  base64image: Yup.string().required("Image is required"),
 });
 
 const Book = () => {
@@ -49,19 +52,10 @@ const Book = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [editingBook, setEditingBook] = useState(null);
-  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [open, setOpen] = useState(false);
   const [deleteBookId, setDeleteBookId] = useState(null);
   const [categories, setCategories] = useState([]);
-
-  const initialValues = {
-    id: editingBook?.id || 0,
-    name: editingBook?.name || "",
-    price: editingBook?.price || "",
-    categoryId: editingBook?.categoryId || "",
-    description: editingBook?.description || "",
-    base64image: editingBook?.base64image || null,
-  };
 
   useEffect(() => {
     fetchBooks();
@@ -70,7 +64,7 @@ const Book = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await getAllCategories();
+      const response = await categoryService.getAll();
       setCategories(response);
     } catch (error) {
       toast.error("Failed to fetch categories");
@@ -97,6 +91,13 @@ const Book = () => {
     }
   };
 
+  const handleImageChange = (imageData) => {
+    setSelectedBook((prevselectedBook) => ({
+      ...prevselectedBook,
+      base64image: imageData,
+    }));
+  };
+
   const handlePageChange = (event, newPage) => {
     setCurrentPage(newPage);
   };
@@ -114,21 +115,21 @@ const Book = () => {
   const handleEditBook = async (bookId) => {
     try {
       const book = await getBookById(bookId);
-      setEditingBook(book);
-      setDeleteConfirmationOpen(false);
+      setSelectedBook(book);
+      setOpen(false);
     } catch (error) {
       toast.error("Failed to fetch book details");
     }
   };
 
-  const handleDeleteConfirmationOpen = (bookId) => {
+  const handleopen = (bookId) => {
     setDeleteBookId(bookId);
-    setDeleteConfirmationOpen(true);
+    setOpen(true);
   };
 
-  const handleDeleteConfirmationClose = () => {
+  const handleClose = () => {
     setDeleteBookId(null);
-    setDeleteConfirmationOpen(false);
+    setOpen(false);
   };
 
   const handleDeleteBook = async () => {
@@ -136,8 +137,8 @@ const Book = () => {
       await deleteBook(deleteBookId);
       toast.success("Book deleted successfully");
       fetchBooks();
-      setEditingBook(null);
-      setDeleteConfirmationOpen(false);
+      setSelectedBook(null);
+      setOpen(false);
       setDeleteBookId(null);
     } catch (error) {
       toast.error("Failed to delete book");
@@ -145,24 +146,45 @@ const Book = () => {
   };
 
   const handleSaveBook = async (values) => {
-    console.log(values);
+    const bookData = {
+      id: values.id,
+      name: values.name,
+      categoryId: values.categoryId,
+      base64image: values.base64image,
+      price: values.price,
+      description: values.description,
+    };
     try {
-      delete values.category;
-      if (values.id !== 0) {
-        await updateBook(values.id, values);
+      if (bookData.id !== 0) {
+        console.log("edit ", bookData);
+        console.log(bookData.id);
+        await updateBook(bookData);
         toast.success("Book updated successfully");
       } else {
-        await addBook(values);
+        console.log("add ", bookData);
+        console.log(bookData.id);
+        delete bookData.id;
+        await addBook(bookData);
         toast.success("Book added successfully");
       }
       fetchBooks();
-      setEditingBook(null);
+      setSelectedBook(null);
     } catch (error) {
       toast.error("Failed to save book");
     }
   };
+
   const handleCancelEdit = () => {
-    setEditingBook(null);
+    setSelectedBook(null);
+  };
+
+  const initialValues = {
+    id: 0,
+    name: "",
+    price: "",
+    categoryId: "",
+    description: "",
+    base64image: null,
   };
 
   return (
@@ -183,7 +205,10 @@ const Book = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => setEditingBook({})}
+            onClick={() => {
+              console.log("addclick");
+              setSelectedBook({ id: 0 });
+            }}
           >
             Add
           </Button>
@@ -233,7 +258,7 @@ const Book = () => {
                   <Button
                     variant="outlined"
                     color="primary"
-                    onClick={() => handleDeleteConfirmationOpen(book.id)}
+                    onClick={() => handleopen(book.id)}
                   >
                     Delete
                   </Button>
@@ -258,14 +283,14 @@ const Book = () => {
         labelRowsPerPage="Books per page:"
       />
 
-      <Dialog open={!!editingBook} onClose={handleCancelEdit}>
+      <Dialog open={!!selectedBook} onClose={handleCancelEdit}>
         <DialogTitle>Book Form</DialogTitle>
         <Formik
-          initialValues={initialValues}
+          initialValues={selectedBook || initialValues}
           validationSchema={validationSchema}
           onSubmit={handleSaveBook}
         >
-          {({ errors, touched }) => (
+          {(formik) => (
             <Form>
               <DialogContent>
                 <FieldWrapper>
@@ -276,8 +301,8 @@ const Book = () => {
                     id="name"
                     name="name"
                     label="Book Name"
-                    error={touched.name && !!errors.name}
-                    helperText={touched.name && errors.name}
+                    // error={touched.name && !!errors.name}
+                    // helperText={touched.name && errors.name}
                   />
                   <Field
                     as={TextField}
@@ -286,8 +311,9 @@ const Book = () => {
                     id="price"
                     name="price"
                     label="Price"
-                    error={touched.price && !!errors.price}
-                    helperText={touched.price && errors.price}
+                    type="number"
+                    // error={touched.price && !!errors.price}
+                    // helperText={touched.price && errors.price}
                   />
                 </FieldWrapper>
 
@@ -300,8 +326,8 @@ const Book = () => {
                     name="categoryId"
                     select
                     label="Category"
-                    error={touched.categoryId && !!errors.categoryId}
-                    helperText={touched.categoryId && errors.categoryId}
+                    // error={touched.categoryId && !!errors.categoryId}
+                    // helperText={touched.categoryId && errors.categoryId}
                   >
                     {categories.map((category) => (
                       <MenuItem key={category.id} value={category.id}>
@@ -309,12 +335,16 @@ const Book = () => {
                       </MenuItem>
                     ))}
                   </Field>
-                  <ImageField
+                  <Field
+                    component={ImageField}
                     id="bookimg"
                     name="base64image"
-                    initialImage={editingBook?.base64image || null}
+                    initialImage={selectedBook?.base64image}
                     label="Book Image"
-                    error={touched.base64image && !!errors.base64image}
+                    value={formik.values.base64image}
+                    onImageChange={(imageData) =>
+                      formik.setFieldValue("base64image", imageData)
+                    }
                   />
                 </FieldWrapper>
 
@@ -328,8 +358,8 @@ const Book = () => {
                     id="description"
                     name="description"
                     label="Description"
-                    error={touched.description && !!errors.description}
-                    helperText={touched.description && errors.description}
+                    // error={touched.description && !!errors.description}
+                    // helperText={touched.description && errors.description}
                   />
                 </FieldWrapper>
 
@@ -339,6 +369,7 @@ const Book = () => {
                     fullWidth
                     variant="contained"
                     color="secondary"
+                    onClick={() => console.log("save")}
                   >
                     Save
                   </RegLogButton>
@@ -357,10 +388,7 @@ const Book = () => {
         </Formik>
       </Dialog>
 
-      <Dialog
-        open={deleteConfirmationOpen}
-        onClose={handleDeleteConfirmationClose}
-      >
+      <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           Are you sure you want to delete this book?
@@ -373,7 +401,7 @@ const Book = () => {
           >
             Delete
           </Button>
-          <Button variant="contained" onClick={handleDeleteConfirmationClose}>
+          <Button variant="contained" onClick={handleClose}>
             Cancel
           </Button>
         </DialogActions>

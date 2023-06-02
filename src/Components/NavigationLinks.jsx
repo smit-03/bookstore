@@ -29,7 +29,12 @@ const NavigationLinks = () => {
         </NavigationButton>
       )}
       {items.map((item) => (
-        <NavigationButton color="inherit" component={Link} to={item.route}>
+        <NavigationButton
+          key={item.route}
+          color="inherit"
+          component={Link}
+          to={item.route}
+        >
           {item.name}
         </NavigationButton>
       ))}

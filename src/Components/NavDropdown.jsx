@@ -50,7 +50,12 @@ const NavDropdown = ({ anchorEl, handleMenuOpen, handleMenuClose }) => {
           </MenuItem>
         )}
         {items.map((item) => (
-          <MenuItem component={Link} to={item.route} onClick={handleMenuClose}>
+          <MenuItem
+            component={Link}
+            to={item.route}
+            onClick={handleMenuClose}
+            key={item.route}
+          >
             {item.name}
           </MenuItem>
         ))}
