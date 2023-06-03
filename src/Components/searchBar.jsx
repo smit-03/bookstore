@@ -1,5 +1,5 @@
 import SearchIcon from "@mui/icons-material/Search";
-import "./searchBar.css";
+import "../assets/styles/searchBar.css";
 
 export const SearchBar = ({ onSearch, setInput }) => {
   const handleChange = (value) => {
@@ -34,8 +34,9 @@ const SearchResult = ({ result }) => {
 export const SearchResultsList = ({ results }) => {
   return (
     <>
+      {console.log(results)}
       {results.length === 0 ? (
-        <div className="results-list not-found">Not Found</div>
+        <div className="results-list-container not-found">Not Found</div>
       ) : (
         <div className="results-list-container">
           <div className="results-list">

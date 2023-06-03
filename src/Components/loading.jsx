@@ -1,29 +1,20 @@
-import React, { useState } from "react";
-import CircularProgress from "@mui/material/CircularProgress";
+import React from "react";
+import { showLoader, hideLoader } from "../service/request";
+import "../assets/styles/Loading.css";
 
-const withLoading = (WrappedComponent) => {
-  return (props) => {
-    const [loading, setLoading] = useState(false);
-
-    const startLoading = () => {
-      setLoading(true);
-    };
-
-    const stopLoading = () => {
-      setLoading(false);
-    };
-
-    return (
-      <>
-        {loading && <CircularProgress />}
-        <WrappedComponent
-          {...props}
-          startLoading={startLoading}
-          stopLoading={stopLoading}
-        />
-      </>
-    );
-  };
+const Loading = () => {
+  return (
+    <div className="loading-overlay">
+      <div className="loading-container">
+        <div className="dot dot-1"></div>
+        <div className="dot dot-2"></div>
+        <div className="dot dot-3"></div>
+      </div>
+    </div>
+  );
 };
 
-export default withLoading;
+Loading.show = showLoader;
+Loading.hide = hideLoader;
+
+export default Loading;

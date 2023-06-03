@@ -1,0 +1,11 @@
+.responsive-logo {
+  max-width: 160px;
+  height: auto;
+  margin-right: 2.5vh;
+}
+
+@media (max-width: 1200px) {
+  .responsive-logo {
+    max-width: 120px;
+  }
+}

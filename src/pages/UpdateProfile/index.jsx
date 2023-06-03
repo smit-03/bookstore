@@ -1,32 +1,38 @@
-import React, { useState, useEffect } from "react";
-import { TextField, Typography, Container, MenuItem } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { TextField, Container, MenuItem } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import authService from "../../service/auth.service";
 import { toast } from "react-toastify";
 import { RoutePaths } from "../../utils/enum";
-import Loading from "../../Components/Loading";
+import { useAuthContext } from "../../context/auth.context";
+import userService from "../../service/user.service";
 import {
   RegFormContainer,
   FieldWrapper,
-  BreadcrumbsContainer,
-  SectionTitle,
   StyledButton,
   PageTitle,
 } from "../../style";
-import { useAuthContext } from "../../context/auth.context";
+import Loading from "../../Components/Loading";
 
-const Register = () => {
-  const navigate = useNavigate();
-  const [loading, setloading] = useState(false);
+const UpdateProfile = () => {
+  const [loading, setLoading] = useState(false);
   const authContext = useAuthContext();
+  const navigate = useNavigate();
+
+  const [initialValues, setInitialValues] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   const validationSchema = Yup.object().shape({
     firstName: Yup.string().required("First Name is required"),
     lastName: Yup.string().required("Last Name is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
-    roleId: Yup.number().required("Role is required"),
     password: Yup.string()
       .required("Password is required")
       .min(5, "Password must be at least 5 characters long"),
@@ -35,39 +41,52 @@ const Register = () => {
       .oneOf([Yup.ref("password"), null], "Passwords must match"),
   });
 
-  const initialValues = {
-    firstName: "",
-    lastName: "",
-    email: "",
-    roleId: "",
-    password: "",
-    confirmPassword: "",
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        setLoading(true);
+        const userProfile = await userService.getById(authContext.user.id);
+        const { password, ...userProfileWithoutPassword } = userProfile;
+        setInitialValues(userProfileWithoutPassword);
+        setLoading(false);
+      } catch (error) {
+        toast.error("Failed to fetch user profile");
+        setLoading(false);
+      }
+    };
+
+    if (!authContext.user.id) {
+      navigate(RoutePaths.home);
+    } else {
+      fetchUserProfile();
+    }
+  }, [authContext.user, authContext.user.id, navigate]);
+
+  const handleSubmit = async (values) => {
+    try {
+      setLoading(true);
+      const updatedUser = {
+        id: authContext.user.id,
+        email: values.email,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        roleId: authContext.user.roleId,
+        role: authContext.user.role,
+        password: values.password,
+      };
+      await userService.update(updatedUser);
+      toast.success("User updated successfully");
+      setLoading(false);
+      authContext.signOut();
+      navigate(RoutePaths.login);
+    } catch (error) {
+      toast.error("Failed to update user");
+      setLoading(false);
+    }
   };
 
-  useEffect(() => {
-    if (authContext.user.id) {
-      navigate(RoutePaths.home);
-    }
-  }, [authContext.user, navigate]);
-
-  const handleSubmit = (data) => {
-    setloading(true);
-    console.log(data);
-    delete data.id;
-    delete data.confirmPassword;
-
-    authService
-      .create(data)
-      .then((res) => {
-        console.log("Registered!!");
-        toast.success("Successfully Registered");
-        setloading(false);
-        navigate(RoutePaths.login);
-      })
-      .catch((error) => {
-        toast.error();
-        setloading(false);
-      });
+  const handleCancelEdit = () => {
+    navigate(RoutePaths.home);
   };
 
   if (loading) {
@@ -88,17 +107,8 @@ const Register = () => {
   return (
     <Container component="main">
       <RegFormContainer>
-        <BreadcrumbsContainer separator="›" aria-label="breadcrumb">
-          <Link
-            to={RoutePaths.login}
-            style={{ textDecoration: "none", color: "red" }}
-          >
-            Login
-          </Link>
-          <Typography color="textPrimary">Register</Typography>
-        </BreadcrumbsContainer>
         <PageTitle mb={4} mt={3}>
-          Register
+          Profile
         </PageTitle>
 
         <Formik
@@ -108,7 +118,6 @@ const Register = () => {
         >
           {({ errors, touched }) => (
             <Form>
-              <SectionTitle>Personal Information</SectionTitle>
               <FieldWrapper>
                 <Field
                   as={TextField}
@@ -131,7 +140,6 @@ const Register = () => {
                   helperText={touched.lastName && errors.lastName}
                 />
               </FieldWrapper>
-
               <FieldWrapper>
                 <Field
                   as={TextField}
@@ -143,23 +151,7 @@ const Register = () => {
                   error={touched.email && !!errors.email}
                   helperText={touched.email && errors.email}
                 />
-                <Field
-                  as={TextField}
-                  variant="outlined"
-                  fullWidth
-                  id="roleId"
-                  name="roleId"
-                  select
-                  label="Role"
-                  error={touched.roleId && !!errors.roleId}
-                  helperText={touched.roleId && errors.roleId}
-                >
-                  <MenuItem value="2">Seller</MenuItem>
-                  <MenuItem value="3">Buyer</MenuItem>
-                </Field>
               </FieldWrapper>
-
-              <SectionTitle>Login Information</SectionTitle>
               <FieldWrapper>
                 <Field
                   as={TextField}
@@ -168,7 +160,7 @@ const Register = () => {
                   id="password"
                   name="password"
                   type="password"
-                  label="Password"
+                  label="New Password"
                   error={touched.password && !!errors.password}
                   helperText={touched.password && errors.password}
                 />
@@ -184,19 +176,25 @@ const Register = () => {
                   helperText={touched.confirmPassword && errors.confirmPassword}
                 />
               </FieldWrapper>
-              <div>
-                <Link to={RoutePaths.login} style={{ color: "red" }}>
-                  Already have an account??
-                </Link>
-              </div>
-              <StyledButton
-                type="submit"
-                variant="contained"
-                color="secondary"
-                style={{ marginTop: "2rem" }}
-              >
-                Register
-              </StyledButton>
+              <FieldWrapper>
+                <StyledButton
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => console.log("save")}
+                >
+                  Save
+                </StyledButton>
+                <StyledButton
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCancelEdit}
+                >
+                  Cancel
+                </StyledButton>
+              </FieldWrapper>
             </Form>
           )}
         </Formik>
@@ -205,4 +203,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default UpdateProfile;

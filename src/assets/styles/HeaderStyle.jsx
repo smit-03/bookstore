@@ -1,4 +1,4 @@
-import { styled } from "@mui/material";
+import { styled } from "@mui/system";
 import { Typography, Button } from "@mui/material";
 
 export const HeaderContainer = styled("header")`

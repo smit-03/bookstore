@@ -25,21 +25,19 @@ const deleteCategory = async (id) => {
         return res;
     });
 };
-
-const save = async (data) => {
-    if (data.id) {
-        const url = `${ENDPOINT}`;
-        return request.put(url, data).then((res) => {
-            return res;
-        });
-    } else {
-        const url = `${ENDPOINT}`;
-        return request.post(url, data).then((res) => {
-            return res;
-        });
-    }
+const updateCategory = async (data) => {
+    const url = `${ENDPOINT}`;
+    return request.put(url, data).then((res) => {
+        return res;
+    });
+};
+const addCategory = async (data) => {
+    const url = `${ENDPOINT}`;
+    return request.post(url, data).then((res) => {
+        return res;
+    });
 };
 
-const categoryService = { getAll, getById, deleteCategory, save };
+const categoryService = { getAll, getById, deleteCategory, addCategory, updateCategory };
 
 export default categoryService;

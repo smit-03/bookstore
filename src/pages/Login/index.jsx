@@ -13,39 +13,37 @@ import {
   MainContainer,
   InfoContainer,
   SectionTitle,
-  RegLogButton,
-  StyledCircularProgress,
+  StyledButton,
 } from "../../style";
 import { useAuthContext } from "../../context/auth.context";
-
-const validationSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  password: Yup.string()
-    .required("Password is required")
-    .min(5, "Password must be at least 5 characters long"),
-});
-
-const initialValues = {
-  email: "",
-  password: "",
-};
+import Loading from "../../Components/Loading";
 
 const Login = () => {
   const authContext = useAuthContext();
   const navigate = useNavigate();
-  // useEffect(() => {
-  //   if (authContext.user.id) {
-  //     navigate(RoutePaths.home);
-  //   }
-  // }, [authContext.user]);
-
   const [loading, setLoading] = useState(false);
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    password: Yup.string()
+      .required("Password is required")
+      .min(5, "Password must be at least 5 characters long"),
+  });
+
+  const initialValues = {
+    email: "",
+    password: "",
+  };
+
+  useEffect(() => {
+    if (authContext.user.id) {
+      navigate(RoutePaths.home);
+    }
+  }, [authContext.user]);
 
   const handleSubmit = (data) => {
-    console.log(data);
-    delete data.id;
-
     setLoading(true);
+    // console.log(data);
+    delete data.id;
 
     authService
       .login(data)
@@ -53,15 +51,27 @@ const Login = () => {
         console.log("Logged In!!");
         toast.success("Successfully Logged In");
         authContext.setUser(res);
-        navigate(RoutePaths.home);
+        setLoading(false);
       })
       .catch((error) => {
         toast.error();
-      })
-      .finally(() => {
         setLoading(false);
       });
   };
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <Container component="main">
@@ -74,7 +84,7 @@ const Login = () => {
           <Typography color="textPrimary">Login</Typography>
           <Link
             to={RoutePaths.register}
-            style={{ textDecoration: "none", color: "inherit" }}
+            style={{ textDecoration: "none", color: "red" }}
           >
             Register
           </Link>
@@ -94,11 +104,10 @@ const Login = () => {
                 <li>view and track orders and more</li>
               </ul>
             </div>
-            <RegLogButton
+            <StyledButton
               variant="contained"
               color="secondary"
               style={{ marginTop: "auto" }}
-              disabled={loading}
             >
               <Link
                 to={RoutePaths.register}
@@ -106,7 +115,7 @@ const Login = () => {
               >
                 Create New Account
               </Link>
-            </RegLogButton>
+            </StyledButton>
           </InfoContainer>
           <LogFormContainer>
             <SectionTitle>Registered Customer</SectionTitle>
@@ -143,16 +152,14 @@ const Login = () => {
                     error={touched.password && !!errors.password}
                     helperText={touched.password && errors.password}
                   />
-                  <RegLogButton
+                  <StyledButton
                     type="submit"
                     variant="contained"
                     color="secondary"
                     style={{ marginTop: "auto" }}
-                    disabled={loading}
                   >
-                    {loading && <StyledCircularProgress size={20} />}
                     Login
-                  </RegLogButton>
+                  </StyledButton>
                 </Form>
               )}
             </Formik>

@@ -70,7 +70,7 @@ const BookDetailsOverlay = ({ book, onClose }) => {
             {description}
           </Typography>
           <Typography variant="h5" align="center">
-            Price: Rs. {price}
+            MRP : Rs. {price}
           </Typography>
           <Button
             variant="contained"

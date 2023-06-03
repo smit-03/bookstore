@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { styled } from "@mui/material";
+import { styled } from "@mui/system";
 import {
   Container,
   Typography,
@@ -8,7 +8,6 @@ import {
   Paper,
   Grid,
   Link,
-  CircularProgress,
   Snackbar,
   Alert,
 } from "@mui/material";
@@ -35,27 +34,18 @@ const StyledButton = styled(Button)`
   margin-right: 10px;
 `;
 
-const StyledCircularProgress = styled(CircularProgress)`
-  margin-right: 10px;
-`;
-
 const ContactPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setLoading(true);
-
-    // Simulating form submission with a timeout
-    setTimeout(() => {
-      setLoading(false);
+    const timeout = setTimeout(() => {
       setShowSnackbar(true);
       setSnackbarSeverity("success");
       setSnackbarMessage("Your message has been submitted successfully!");
@@ -64,6 +54,9 @@ const ContactPage = () => {
       setSubject("");
       setMessage("");
     }, 2000);
+    return () => {
+      clearTimeout(timeout);
+    };
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -124,16 +117,10 @@ const ContactPage = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <StyledButton
-                variant="contained"
-                color="primary"
-                type="submit"
-                disabled={loading}
-              >
-                {loading && <StyledCircularProgress size={20} />}
+              <StyledButton variant="contained" color="primary" type="submit">
                 Submit
               </StyledButton>
-              <StyledButton variant="contained" type="reset" disabled={loading}>
+              <StyledButton variant="contained" type="reset">
                 Reset
               </StyledButton>
             </Grid>

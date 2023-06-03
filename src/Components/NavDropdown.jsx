@@ -1,10 +1,18 @@
 import { React, useMemo } from "react";
+import { styled } from "@mui/system";
 import { Menu, MenuItem, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link, Route } from "react-router-dom";
 import { RoutePaths } from "../utils/enum";
 import { useAuthContext } from "../context/auth.context";
 import shared from "../utils/shared";
+
+const StyledMenu = styled(Menu)`
+  .MuiPaper-root {
+    background-color: #414141;
+    color: white;
+  }
+`;
 
 const NavDropdown = ({ anchorEl, handleMenuOpen, handleMenuClose }) => {
   const authContext = useAuthContext();
@@ -26,7 +34,7 @@ const NavDropdown = ({ anchorEl, handleMenuOpen, handleMenuClose }) => {
       >
         <MenuIcon />
       </IconButton>
-      <Menu
+      <StyledMenu
         id="dropdown-menu"
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -45,6 +53,7 @@ const NavDropdown = ({ anchorEl, handleMenuOpen, handleMenuClose }) => {
             component={Link}
             to={RoutePaths.login}
             onClick={handleMenuClose}
+            style={{ backgroundColor: "#414141" }}
           >
             Login
           </MenuItem>
@@ -61,19 +70,12 @@ const NavDropdown = ({ anchorEl, handleMenuOpen, handleMenuClose }) => {
         ))}
         <MenuItem
           component={Link}
-          to={RoutePaths.about}
-          onClick={handleMenuClose}
-        >
-          About
-        </MenuItem>
-        <MenuItem
-          component={Link}
           to={RoutePaths.contact}
           onClick={handleMenuClose}
         >
           Contact
         </MenuItem>
-      </Menu>
+      </StyledMenu>
     </>
   );
 };

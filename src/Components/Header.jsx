@@ -12,21 +12,19 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from "react-router-dom";
 import { RoutePaths } from "../utils/enum";
-import { SearchBar, SearchResultsList } from "./searchBar/searchBar";
+import { SearchBar, SearchResultsList } from "./searchBar";
 import { searchBook } from "../service/book.service";
 import NavDropdown from "./NavDropdown";
 import NavigationLinks from "./NavigationLinks";
 import {
   HeaderContainer,
-  Title,
   SLOButton,
   CounteItem,
   ResultContainer,
-} from "./HeaderStyle";
+  NavigationButton,
+} from "../assets/styles/HeaderStyle";
 import { useAuthContext } from "../context/auth.context";
-// import { CartContext } from "../context/cart.context";
-// import { useContext } from "react";
-
+import Logo from "./Logo";
 const Header = () => {
   const authContext = useAuthContext();
   // const { cartItems } = useContext(CartContext);
@@ -38,6 +36,7 @@ const Header = () => {
   const [authContextUpdated, setAuthContextUpdated] = useState(false);
 
   useEffect(() => {
+    console.log(authContext.user);
     setAuthContextUpdated((prevState) => !prevState);
   }, [authContext]);
 
@@ -110,14 +109,17 @@ const Header = () => {
               />
             ) : null}
 
-            <Title variant="h6">myBooks</Title>
+            {/* Logo */}
+
+            <Logo />
+
             {/* Home Icon */}
 
             <Link to={RoutePaths.home}>
               <HomeRoundedIcon
                 style={{
                   fontSize: "2.2rem",
-                  marginRight: "1.8rem",
+                  marginRight: "1rem",
                   color: "white",
                 }}
               />
@@ -161,13 +163,30 @@ const Header = () => {
                 />
               </Link>
             ) : (
-              <SLOButton
-                variant="outlined"
-                component={Link}
-                to={RoutePaths.register}
-              >
-                Sign In
-              </SLOButton>
+              <>
+                {!authContext.user.id && (
+                  <NavigationButton
+                    color="inherit"
+                    component={Link}
+                    to={RoutePaths.login}
+                    style={{
+                      fontSize: "1rem",
+                      fontFamily: "Roboto,Helvetica, Arial, sans-serif",
+                      marginLeft: "1rem",
+                      fontWeight: "700",
+                    }}
+                  >
+                    Login
+                  </NavigationButton>
+                )}
+                <SLOButton
+                  variant="outlined"
+                  component={Link}
+                  to={RoutePaths.register}
+                >
+                  Sign Up
+                </SLOButton>
+              </>
             )}
 
             {/* CartIcon */}

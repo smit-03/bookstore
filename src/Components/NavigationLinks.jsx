@@ -1,7 +1,10 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { RoutePaths } from "../utils/enum";
-import { NavigationLinksContainer, NavigationButton } from "./HeaderStyle";
+import {
+  NavigationLinksContainer,
+  NavigationButton,
+} from "../assets/styles/HeaderStyle";
 import shared from "../utils/shared";
 import { useAuthContext } from "../context/auth.context";
 
@@ -15,19 +18,6 @@ const NavigationLinks = () => {
   }, []);
   return (
     <NavigationLinksContainer>
-      {!authContext.user.id && (
-        <NavigationButton
-          color="inherit"
-          component={Link}
-          to={RoutePaths.login}
-          style={{
-            fontSize: "1rem",
-            fontFamily: "Georgia, serif",
-          }}
-        >
-          Login
-        </NavigationButton>
-      )}
       {items.map((item) => (
         <NavigationButton
           key={item.route}
@@ -38,9 +28,6 @@ const NavigationLinks = () => {
           {item.name}
         </NavigationButton>
       ))}
-      <NavigationButton color="inherit" component={Link} to={RoutePaths.about}>
-        About
-      </NavigationButton>
       <NavigationButton
         color="inherit"
         component={Link}

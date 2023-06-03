@@ -1,10 +1,10 @@
-import { styled } from "@mui/material";
+import { Typography, styled } from "@mui/material";
 import {
   Button,
   Breadcrumbs,
   CircularProgress,
   Paper,
-  Container,
+  IconButton,
   Grid,
 } from "@mui/material";
 
@@ -36,7 +36,7 @@ export const ErrorContainer = styled("div")`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height: 75vh;
   font-family: Arial, sans-serif;
 `;
 
@@ -134,7 +134,7 @@ export const SectionTitle = styled("h2")`
     background-color: rgba(0, 0, 0, 0.1);
   }
 `;
-export const RegLogButton = styled(Button)`
+export const StyledButton = styled(Button)`
   align-self: flex-start;
   background-color: red;
 `;
@@ -143,7 +143,7 @@ export const BreadcrumbsContainer = styled(Breadcrumbs)`
   margin: auto;
   display: flex;
   align-items: center;
-  margin-top: 10vh;
+  margin-top: 4vh;
 `;
 
 export const RegFormContainer = styled("div")`
@@ -158,6 +158,38 @@ export const FieldWrapper = styled("div")`
   margin-bottom: 2rem;
 `;
 
-export const StyledCircularProgress = styled(CircularProgress)`
-  margin-right: 10px;
+export const PageTitle = styled(Typography)`
+  color: #414141;
+  position: relative;
+  font-size: 5vh;
+  text-align: center;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 45px;
+  letter-spacing: 0px;
+  padding-bottom: 18px;
+  &::after {
+    left: 50%;
+    width: 165px;
+    bottom: 0;
+    height: 2px;
+    content: "";
+    position: absolute;
+    transform: translateX(-50%);
+    background-color: red;
+  }
+`;
+
+export const SearchField = styled("div")`
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  padding: 3px;
+  border: 2px solid #838383;
+  & input {
+    flex-grow: 1;
+    padding: 8px;
+    font-size: 16px;
+  }
 `;

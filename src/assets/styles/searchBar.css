@@ -1,6 +1,6 @@
 .input-wrapper {
-  width: 35%;
-  height: 6.5vh;
+  width: 25%;
+  height: 3vw;
   border: none;
   border-radius: 10px;
   padding: 0 6px;
@@ -37,7 +37,7 @@ input:focus {
 }
 
 .results-list-container {
-  width: 34%;
+  width: 24%;
   background-color: white;
   display: flex;
   flex-direction: column;
@@ -47,7 +47,7 @@ input:focus {
   max-height: 20vh;
   color: black;
   overflow: auto;
-  margin-left: 53.5vw;
+  margin-left: 63.5vw;
   position: fixed;
   z-index: 9999;
   top: 2.7vh;
@@ -60,7 +60,7 @@ input:focus {
   padding: 0.5rem;
 }
 .not-found {
-  width: 31%;
+  width: 21%;
   padding: 0.5rem 1.5rem;
   background-color: #f8f6f6;
 }

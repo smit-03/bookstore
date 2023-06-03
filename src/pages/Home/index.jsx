@@ -4,20 +4,26 @@ import {
   Typography,
   Grid,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
   MenuItem,
-  CircularProgress,
   Button,
   Pagination,
 } from "@mui/material";
-import { BookCard, BookImage, BookName, BookSub } from "../../style";
+import {
+  BookCard,
+  BookImage,
+  BookName,
+  BookSub,
+  SearchField,
+  PageTitle,
+} from "../../style";
+import { styled } from "@mui/system";
+import SearchIcon from "@mui/icons-material/Search";
 import BookDetailsOverlay from "./BookDetailsOverlay";
 import {
   getAllPaginatedBooks,
   getAllBooksOfKeyword,
 } from "../../service/book.service";
+import Loading from "../../Components/Loading";
 
 const BookListing = () => {
   const [books, setBooks] = useState([]);
@@ -25,9 +31,9 @@ const BookListing = () => {
   const [keyword, setKeyword] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedBook, setSelectedBook] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   const openBookDetails = (book) => {
     setSelectedBook(book);
@@ -44,7 +50,7 @@ const BookListing = () => {
   useEffect(() => {
     const delay = setTimeout(() => {
       setDebouncedKeyword(keyword);
-    }, 1000);
+    }, 700);
 
     return () => {
       clearTimeout(delay);
@@ -53,8 +59,8 @@ const BookListing = () => {
 
   useEffect(() => {
     const loadBooks = async () => {
-      setLoading(true);
       try {
+        setLoading(true);
         let response;
         if (!debouncedKeyword || debouncedKeyword === "") {
           response = await getAllPaginatedBooks(pageSize, currentPage);
@@ -68,9 +74,9 @@ const BookListing = () => {
         const { items, totalItems } = response;
         setBooks(items);
         setTotalCount(totalItems);
+        setLoading(false);
       } catch (error) {
         console.error("Error loading books:", error);
-      } finally {
         setLoading(false);
       }
     };
@@ -103,7 +109,6 @@ const BookListing = () => {
   const handlePageChange = async (event, page) => {
     setCurrentPage(page);
   };
-
   if (loading) {
     return (
       <div
@@ -114,51 +119,63 @@ const BookListing = () => {
           height: "100vh",
         }}
       >
-        <CircularProgress />
+        <Loading />
       </div>
     );
   }
+  const StyledTextField = styled(TextField)`
+    .MuiSelect-root {
+      padding-top: 6px;
+      padding-bottom: 6px;
+    }
+  `;
 
   return (
-    <Container>
-      <Typography variant="h4">Book Listing</Typography>
-      <Grid container className="name-wrapper">
-        <Grid item xs={6}>
-          <Typography variant="h6">
-            Total<span> - {totalCount} items</span>
-          </Typography>
-        </Grid>
-        <Grid item className="dropdown-wrapper">
-          <FormControl fullWidth>
-            <TextField
-              id="text"
-              name="text"
-              placeholder="Search..."
-              type="text"
+    <Container style={{ marginTop: "15vh" }}>
+      <PageTitle mb={4}>Book List</PageTitle>
+      <Grid container>
+        <Grid container justifyContent="flex-end" alignItems="center" mb={2}>
+          <Grid
+            item
+            xs={6}
+            alignSelf="flex-start"
+            paddingTop="10px"
+            marginRight="auto"
+          >
+            <Typography variant="h6">
+              Total<span> - {totalCount} items</span>
+            </Typography>
+          </Grid>
+          <Grid item marginRight={2}>
+            <SearchField name="searchField">
+              <input
+                type="text"
+                placeholder="Search"
+                aria-label="Search"
+                value={keyword}
+                onChange={handleSearchChange}
+              />
+              <SearchIcon />
+            </SearchField>
+          </Grid>
+          <Grid item>
+            <StyledTextField
               variant="outlined"
-              size="small"
-              value={keyword}
-              onChange={handleSearchChange}
-            />
-          </FormControl>
-        </Grid>
-        <Grid item className="dropdown-wrapper">
-          <FormControl>
-            <InputLabel id="sort-order-label">Sort Order</InputLabel>
-            <Select
-              labelId="sort-order-label"
+              fullWidth
               id="sort-order"
+              name="sort-order"
+              select
+              label=""
               value={sortOrder}
               onChange={handleSortOrder}
-              label="Sort Order"
             >
               <MenuItem value="asc">a - z</MenuItem>
               <MenuItem value="desc">z - a</MenuItem>
-            </Select>
-          </FormControl>
+            </StyledTextField>
+          </Grid>
         </Grid>
       </Grid>
-      <Grid container spacing={2} className="book-grid">
+      <Grid container spacing={2}>
         {sortedBooks.map((book) => (
           <Grid
             item
@@ -171,11 +188,7 @@ const BookListing = () => {
             style={{ cursor: "pointer" }}
           >
             <BookCard elevation={3}>
-              <BookImage
-                src={book.base64image}
-                alt={book.name}
-                className="book-image"
-              />
+              <BookImage src={book.base64image} alt={book.name} />
               <BookName variant="h6" style={{ fontSize: "1rem" }}>
                 {book.name}
               </BookName>
@@ -200,7 +213,7 @@ const BookListing = () => {
         page={currentPage}
         onChange={(event, newPage) => handlePageChange(event, newPage)}
         color="primary"
-        style={{ marginTop: "2rem" }}
+        style={{ marginTop: "2rem", marginBottom: "2rem" }}
       />
       <BookDetailsOverlay book={selectedBook} onClose={closeBookDetails} />
     </Container>

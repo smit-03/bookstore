@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
+import { styled } from "@mui/system";
+
 import {
   Typography,
   TextField,
@@ -18,12 +20,18 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Box,
   MenuItem,
+  Container,
 } from "@mui/material";
 import ImageField from "./ImageField";
-import { FieldWrapper, RegLogButton } from "../../style";
+import {
+  FieldWrapper,
+  PageTitle,
+  StyledButton,
+  SearchField,
+} from "../../style";
 import { toast } from "react-toastify";
+import Loading from "../../Components/Loading";
 
 import {
   getAllBooksOfKeyword,
@@ -33,7 +41,7 @@ import {
   updateBook,
   deleteBook,
 } from "../../service/book.service";
-
+import SearchIcon from "@mui/icons-material/Search";
 import categoryService from "../../service/category.service";
 
 const validationSchema = Yup.object().shape({
@@ -56,23 +64,34 @@ const Book = () => {
   const [open, setOpen] = useState(false);
   const [deleteBookId, setDeleteBookId] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchBooks();
-    fetchCategories();
+    const delay = setTimeout(() => {
+      fetchBooks();
+      fetchCategories();
+    }, 700);
+
+    return () => {
+      clearTimeout(delay);
+    };
   }, [currentPage, pageSize, searchKeyword]);
 
   const fetchCategories = async () => {
     try {
+      setLoading(true);
       const response = await categoryService.getAll();
       setCategories(response);
+      setLoading(false);
     } catch (error) {
       toast.error("Failed to fetch categories");
+      setLoading(false);
     }
   };
 
   const fetchBooks = async () => {
     try {
+      setLoading(true);
       let response;
       const startIndex = currentPage * pageSize + 1;
       if (searchKeyword) {
@@ -86,16 +105,11 @@ const Book = () => {
       }
       setBooks(response.items);
       setTotalBooks(response.totalItems);
+      setLoading(false);
     } catch (error) {
       toast.error("Failed to fetch books");
+      setLoading(false);
     }
-  };
-
-  const handleImageChange = (imageData) => {
-    setSelectedBook((prevselectedBook) => ({
-      ...prevselectedBook,
-      base64image: imageData,
-    }));
   };
 
   const handlePageChange = (event, newPage) => {
@@ -114,11 +128,14 @@ const Book = () => {
 
   const handleEditBook = async (bookId) => {
     try {
+      setLoading(true);
       const book = await getBookById(bookId);
       setSelectedBook(book);
       setOpen(false);
+      setLoading(false);
     } catch (error) {
       toast.error("Failed to fetch book details");
+      setLoading(false);
     }
   };
 
@@ -134,14 +151,17 @@ const Book = () => {
 
   const handleDeleteBook = async () => {
     try {
+      setLoading(true);
       await deleteBook(deleteBookId);
       toast.success("Book deleted successfully");
       fetchBooks();
       setSelectedBook(null);
       setOpen(false);
       setDeleteBookId(null);
+      setLoading(false);
     } catch (error) {
       toast.error("Failed to delete book");
+      setLoading(false);
     }
   };
 
@@ -155,6 +175,7 @@ const Book = () => {
       description: values.description,
     };
     try {
+      setLoading(true);
       if (bookData.id !== 0) {
         console.log("edit ", bookData);
         console.log(bookData.id);
@@ -169,8 +190,10 @@ const Book = () => {
       }
       fetchBooks();
       setSelectedBook(null);
+      setLoading(false);
     } catch (error) {
       toast.error("Failed to save book");
+      setLoading(false);
     }
   };
 
@@ -187,19 +210,36 @@ const Book = () => {
     base64image: null,
   };
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Loading />
+      </div>
+    );
+  }
+
   return (
-    <Box mt={4} mx={6}>
-      <Typography variant="h4" align="center" mb={4}>
-        Book Page
-      </Typography>
+    <Container style={{ marginTop: "15vh" }}>
+      <PageTitle mb={4}>Book Page</PageTitle>
       <Grid container justifyContent="flex-end" alignItems="center" mb={2}>
         <Grid item marginRight={2}>
-          <TextField
-            label="Search"
-            variant="outlined"
-            value={searchKeyword}
-            onChange={handleSearchChange}
-          />
+          <SearchField name="searchField">
+            <input
+              type="text"
+              placeholder="Search"
+              aria-label="Search"
+              value={searchKeyword}
+              onChange={handleSearchChange}
+            />
+            <SearchIcon />
+          </SearchField>
         </Grid>
         <Grid item>
           <Button
@@ -214,7 +254,7 @@ const Book = () => {
           </Button>
         </Grid>
       </Grid>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} style={{ boxShadow: "none" }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -234,9 +274,10 @@ const Book = () => {
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="h6" style={{ color: "#1bbb0c" }}>
-                  Actions
-                </Typography>
+                <Typography
+                  variant="h6"
+                  style={{ color: "#1bbb0c" }}
+                ></Typography>
               </TableCell>
             </TableRow>
           </TableHead>
@@ -364,7 +405,7 @@ const Book = () => {
                 </FieldWrapper>
 
                 <FieldWrapper>
-                  <RegLogButton
+                  <StyledButton
                     type="submit"
                     fullWidth
                     variant="contained"
@@ -372,15 +413,15 @@ const Book = () => {
                     onClick={() => console.log("save")}
                   >
                     Save
-                  </RegLogButton>
-                  <RegLogButton
+                  </StyledButton>
+                  <StyledButton
                     fullWidth
                     variant="contained"
                     color="primary"
                     onClick={handleCancelEdit}
                   >
                     Cancel
-                  </RegLogButton>
+                  </StyledButton>
                 </FieldWrapper>
               </DialogContent>
             </Form>
@@ -406,7 +447,7 @@ const Book = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Container>
   );
 };
 
