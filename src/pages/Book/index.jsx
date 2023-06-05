@@ -68,8 +68,8 @@ const Book = () => {
 
   useEffect(() => {
     const delay = setTimeout(() => {
-      fetchBooks();
       fetchCategories();
+      fetchBooks();
     }, 700);
 
     return () => {
@@ -151,17 +151,15 @@ const Book = () => {
 
   const handleDeleteBook = async () => {
     try {
-      setLoading(true);
       await deleteBook(deleteBookId);
       toast.success("Book deleted successfully");
-      fetchBooks();
       setSelectedBook(null);
       setOpen(false);
       setDeleteBookId(null);
-      setLoading(false);
+      fetchBooks();
     } catch (error) {
       toast.error("Failed to delete book");
-      setLoading(false);
+      setOpen(false);
     }
   };
 
@@ -407,7 +405,6 @@ const Book = () => {
                 <FieldWrapper>
                   <StyledButton
                     type="submit"
-                    fullWidth
                     variant="contained"
                     color="secondary"
                     onClick={() => console.log("save")}
@@ -415,7 +412,6 @@ const Book = () => {
                     Save
                   </StyledButton>
                   <StyledButton
-                    fullWidth
                     variant="contained"
                     color="primary"
                     onClick={handleCancelEdit}

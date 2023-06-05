@@ -91,7 +91,7 @@ const Register = () => {
         <BreadcrumbsContainer separator="›" aria-label="breadcrumb">
           <Link
             to={RoutePaths.login}
-            style={{ textDecoration: "none", color: "red" }}
+            style={{ textDecoration: "none", color: "#fb3c3c" }}
           >
             Login
           </Link>
@@ -185,7 +185,7 @@ const Register = () => {
                 />
               </FieldWrapper>
               <div>
-                <Link to={RoutePaths.login} style={{ color: "red" }}>
+                <Link to={RoutePaths.login} style={{ color: "#fb3c3c" }}>
                   Already have an account??
                 </Link>
               </div>

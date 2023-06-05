@@ -301,7 +301,6 @@ const Categories = () => {
                 <FieldWrapper style={{ marginTop: "4vh" }}>
                   <StyledButton
                     type="submit"
-                    fullWidth
                     variant="contained"
                     color="secondary"
                     onClick={() => console.log("save")}
@@ -309,7 +308,6 @@ const Categories = () => {
                     Save
                   </StyledButton>
                   <StyledButton
-                    fullWidth
                     variant="contained"
                     color="primary"
                     onClick={handleCancelEdit}

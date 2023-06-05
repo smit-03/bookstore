@@ -23,6 +23,7 @@ const StyledPaper = styled(Paper)`
 
 const StyledTypography = styled(Typography)`
   margin-bottom: 20px;
+  color: #414141;
 `;
 
 const StyledTextField = styled(TextField)`

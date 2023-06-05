@@ -4,8 +4,7 @@
   border: none;
   border-radius: 10px;
   padding: 0 6px;
-  box-shadow: 0px 0px 8px #ddd;
-  background-color: white;
+  background-color: #fdfff1;
   display: flex;
   align-items: center;
   margin-left: auto;
@@ -38,7 +37,7 @@ input:focus {
 
 .results-list-container {
   width: 24%;
-  background-color: white;
+  background-color: #fdfff1;
   display: flex;
   flex-direction: column;
   box-shadow: 0px 0px 10px #ffa090;

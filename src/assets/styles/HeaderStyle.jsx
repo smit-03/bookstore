@@ -6,8 +6,7 @@ export const HeaderContainer = styled("header")`
   top: 0;
   left: 0;
   right: 0;
-  background-color: red;
-  color: white;
+  color: #fdfff1;
   display: flex;
   align-items: center;
   z-index: 999;
@@ -20,9 +19,10 @@ export const Title = styled(Typography)`
 `;
 
 export const SLOButton = styled(Button)`
-  background-color: white;
+  background-color: #fdfff1;
   color: black;
   margin-left: 1vw;
+  margin-right: 0.5vw;
   text-transform: capitalize;
   font-family: "Apple Color Emoji", "Segoe UI Emoji";
   font-weight: 600;

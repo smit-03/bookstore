@@ -62,7 +62,7 @@ const ImageField = ({ name, initialImage, onImageChange, value, ...props }) => {
               top: 0,
               right: 0,
               backgroundColor: "black",
-              color: "white",
+              color: "#fdfff1",
               borderRadius: "50%",
               padding: "2px",
               boxShadow: "0 0 3px rgba(0, 0, 0, 0.3)",

@@ -10,7 +10,7 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { RoutePaths } from "../utils/enum";
 import { SearchBar, SearchResultsList } from "./searchBar";
 import { searchBook } from "../service/book.service";
@@ -25,9 +25,14 @@ import {
 } from "../assets/styles/HeaderStyle";
 import { useAuthContext } from "../context/auth.context";
 import Logo from "./Logo";
+import { useCartContext } from "../context/cart.context";
+import { toast } from "react-toastify";
+import shared from "../utils/shared";
+
 const Header = () => {
   const authContext = useAuthContext();
-  // const { cartItems } = useContext(CartContext);
+  const cartContext = useCartContext();
+  const navigate = useNavigate();
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const [input, setInput] = useState("");
@@ -68,17 +73,37 @@ const Header = () => {
     setInput(value);
     if (value.trim() !== "") {
       setShowResults(true);
-      await searchBook(value)
-        .then((res) => {
+      const delay = setTimeout(async () => {
+        try {
+          const res = await searchBook(value);
           setSearchResults(res);
-        })
-        .catch((error) => {
+        } catch (error) {
           console.error("Error searching for books:", error);
-        });
+        }
+      }, 700);
+
+      return () => {
+        clearTimeout(delay);
+      };
     } else {
       setShowResults(false);
       setSearchResults([]);
     }
+  };
+
+  const addToCart = (book) => {
+    if (!authContext.user.id) {
+      navigate(RoutePaths.login);
+      toast.error("Please Login");
+    } else
+      shared.addToCart(book, authContext.user.id).then((res) => {
+        if (res.error) {
+          toast.error(res.error);
+        } else {
+          toast.success("Item added in Cart");
+          cartContext.updateCart();
+        }
+      });
   };
 
   const isTabletOrSmaller = useMediaQuery((theme) =>
@@ -120,7 +145,7 @@ const Header = () => {
                 style={{
                   fontSize: "2.2rem",
                   marginRight: "1rem",
-                  color: "white",
+                  color: "#fdfff1",
                 }}
               />
             </Link>
@@ -137,11 +162,11 @@ const Header = () => {
                 <IconButton onClick={authContext.signOut}>
                   <LogoutIcon
                     style={{
-                      border: "2px solid white",
+                      border: "2px solid #fdfff1",
                       borderRadius: "50%",
                       marginLeft: theme.spacing(1),
                       padding: "5px",
-                      color: "white",
+                      color: "#fdfff1",
                     }}
                   />
                 </IconButton>
@@ -154,11 +179,11 @@ const Header = () => {
               <Link to={RoutePaths.register}>
                 <PersonAddIcon
                   style={{
-                    border: "2px solid white",
+                    border: "2px solid #fdfff1",
                     borderRadius: "50%",
                     marginLeft: theme.spacing(1),
                     padding: "5px",
-                    color: "white",
+                    color: "#fdfff1",
                   }}
                 />
               </Link>
@@ -174,6 +199,8 @@ const Header = () => {
                       fontFamily: "Roboto,Helvetica, Arial, sans-serif",
                       marginLeft: "1rem",
                       fontWeight: "700",
+                      boxShadow: "0px 0px 4px #cd0000aa",
+                      borderRadius: "15px",
                     }}
                   >
                     Login
@@ -194,12 +221,13 @@ const Header = () => {
               color="inherit"
               aria-label="cart"
               style={{
-                marginLeft: theme.spacing(2),
                 height: "5vh",
+                paddingRight: 0,
               }}
+              onClick={() => navigate(RoutePaths.cart)}
             >
               <ShoppingCartIcon />
-              <CounteItem>{/* {cartItems.length} */}0</CounteItem>
+              <CounteItem>{cartContext.cartData.length}</CounteItem>
             </IconButton>
           </Toolbar>
         </AppBar>

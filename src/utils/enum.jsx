@@ -5,6 +5,7 @@ export const RoutePaths = {
   contact: "/contact",
   user: "/user",
   category: "/category",
+  cart: "/cart",
   book: "/book",
   updateprofile: "/update-profile",
   edituser: "/edit-user/:id",

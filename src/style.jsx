@@ -1,12 +1,5 @@
 import { Typography, styled } from "@mui/material";
-import {
-  Button,
-  Breadcrumbs,
-  CircularProgress,
-  Paper,
-  IconButton,
-  Grid,
-} from "@mui/material";
+import { Button, Breadcrumbs, Paper, Grid } from "@mui/material";
 
 //makeStyles is not compatible with 'react-18'. Can use styled compo. instead
 /* const useStyles = makeStyles((theme) => ({
@@ -28,7 +21,7 @@ import {
 export const PageContainer = styled("div")`
   min-height: 77vh;
   position: relative;
-  margin-top: 11vh;
+  margin-top: 10vh;
 `;
 
 export const ErrorContainer = styled("div")`
@@ -81,9 +74,8 @@ export const BookCard = styled(Paper)`
 export const BookImage = styled("img")`
   width: 100%;
   height: 15vh;
-  object-fit: cover;
   border-radius: 8px;
-  object-fit: contain;
+  object-fit: cover;
   margin-bottom: 0.6rem;
 `;
 
@@ -136,14 +128,14 @@ export const SectionTitle = styled("h2")`
 `;
 export const StyledButton = styled(Button)`
   align-self: flex-start;
-  background-color: red;
+  background-color: #f82626;
 `;
 
 export const BreadcrumbsContainer = styled(Breadcrumbs)`
   margin: auto;
   display: flex;
   align-items: center;
-  margin-top: 4vh;
+  margin-top: 3vh;
 `;
 
 export const RegFormContainer = styled("div")`
@@ -166,7 +158,7 @@ export const PageTitle = styled(Typography)`
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   font-weight: 700;
   line-height: 1.2;
-  margin-bottom: 45px;
+  margin-bottom: 3vh;
   letter-spacing: 0px;
   padding-bottom: 18px;
   &::after {
@@ -177,7 +169,7 @@ export const PageTitle = styled(Typography)`
     content: "";
     position: absolute;
     transform: translateX(-50%);
-    background-color: red;
+    background-color: #fb3c3c;
   }
 `;
 
@@ -192,4 +184,22 @@ export const SearchField = styled("div")`
     padding: 8px;
     font-size: 16px;
   }
+`;
+
+export const CartItem = styled("div")`
+  display: flex;
+  flex-direction: row;
+  margin-top: 2rem;
+`;
+export const ItemLeft = styled("div")`
+  display: flex;
+  align-items: flex-start;
+`;
+export const ItemRight = styled("div")`
+  display: flex;
+  align-items: flex-end;
+`;
+export const ItemDetails = styled("div")`
+  display: flex;
+  flex-direction: column;
 `;

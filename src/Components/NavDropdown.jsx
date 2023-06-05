@@ -10,7 +10,7 @@ import shared from "../utils/shared";
 const StyledMenu = styled(Menu)`
   .MuiPaper-root {
     background-color: #414141;
-    color: white;
+    color: #fdfff1;
   }
 `;
 
@@ -31,6 +31,7 @@ const NavDropdown = ({ anchorEl, handleMenuOpen, handleMenuClose }) => {
         aria-controls="dropdown-menu"
         aria-haspopup="true"
         onClick={handleMenuOpen}
+        style={{ marginRight: "1rem" }}
       >
         <MenuIcon />
       </IconButton>

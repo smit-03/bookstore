@@ -24,6 +24,10 @@ import {
   getAllBooksOfKeyword,
 } from "../../service/book.service";
 import Loading from "../../Components/Loading";
+import shared from "../../utils/shared";
+import { useAuthContext } from "../../context/auth.context";
+import { useCartContext } from "../../context/cart.context";
+import { toast } from "react-toastify";
 
 const BookListing = () => {
   const [books, setBooks] = useState([]);
@@ -34,6 +38,8 @@ const BookListing = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const authContext = useAuthContext();
+  const cartContext = useCartContext();
 
   const openBookDetails = (book) => {
     setSelectedBook(book);
@@ -45,48 +51,48 @@ const BookListing = () => {
 
   const [sortedBooks, setSortedBooks] = useState([]);
 
-  const [debouncedKeyword, setDebouncedKeyword] = useState("");
-
+  const loadBooks = async () => {
+    try {
+      setLoading(true);
+      let response;
+      if (keyword) {
+        response = await getAllBooksOfKeyword(pageSize, currentPage, keyword);
+      } else {
+        response = await getAllPaginatedBooks(pageSize, currentPage);
+      }
+      const { items, totalItems } = response;
+      setBooks(items);
+      setTotalCount(totalItems);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error loading books:", error);
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     const delay = setTimeout(() => {
-      setDebouncedKeyword(keyword);
+      loadBooks();
     }, 700);
 
     return () => {
       clearTimeout(delay);
     };
-  }, [keyword]);
-
-  useEffect(() => {
-    const loadBooks = async () => {
-      try {
-        setLoading(true);
-        let response;
-        if (!debouncedKeyword || debouncedKeyword === "") {
-          response = await getAllPaginatedBooks(pageSize, currentPage);
-        } else {
-          response = await getAllBooksOfKeyword(
-            pageSize,
-            currentPage,
-            debouncedKeyword
-          );
-        }
-        const { items, totalItems } = response;
-        setBooks(items);
-        setTotalCount(totalItems);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error loading books:", error);
-        setLoading(false);
-      }
-    };
-
-    loadBooks();
-  }, [pageSize, currentPage, debouncedKeyword]);
+  }, [currentPage, pageSize, keyword]);
 
   useEffect(() => {
     sortBooks();
   }, [sortOrder, books]);
+
+  const addToCart = (book) => {
+    shared.addToCart(book, authContext.user.id).then((res) => {
+      if (res.error) {
+        console.log(res.error);
+      } else {
+        toast.success(res.message);
+        cartContext.updateCart();
+      }
+    });
+  };
 
   const sortBooks = () => {
     const sortedBooks = [...books];
@@ -200,6 +206,7 @@ const BookListing = () => {
                 style={{ textTransform: "capitalize" }}
                 onClick={(e) => {
                   e.stopPropagation();
+                  addToCart(book);
                 }}
               >
                 Add to Cart

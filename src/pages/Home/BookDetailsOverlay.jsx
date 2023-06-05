@@ -7,14 +7,27 @@ import {
   Button,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-// import { CartContext } from "../../service/cart.context";
+import { useCartContext } from "../../context/cart.context";
+import { useAuthContext } from "../../context/auth.context";
+import shared from "../../utils/shared";
+import { toast } from "react-toastify";
 
 const BookDetailsOverlay = ({ book, onClose }) => {
-  // const { addToCart } = useContext(CartContext);
+  const cartContext = useCartContext();
+  const authContext = useAuthContext();
   if (!book) {
     return null;
   }
-
+  const addToCart = (book) => {
+    shared.addToCart(book, authContext.user.id).then((res) => {
+      if (res.error) {
+        toast.error(res.message);
+      } else {
+        toast.success(res.message);
+        cartContext.updateCart();
+      }
+    });
+  };
   const { name, description, price, base64image } = book;
 
   return (
@@ -77,7 +90,10 @@ const BookDetailsOverlay = ({ book, onClose }) => {
             color="primary"
             size="small"
             style={{ textTransform: "capitalize", marginTop: "2vh" }}
-            // onClick={() => addToCart(book)}
+            onClick={() => {
+              addToCart(book);
+              // onClose();
+            }}
           >
             Add to Cart
           </Button>

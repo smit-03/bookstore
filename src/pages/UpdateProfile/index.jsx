@@ -117,8 +117,8 @@ const UpdateProfile = () => {
           onSubmit={handleSubmit}
         >
           {({ errors, touched }) => (
-            <Form>
-              <FieldWrapper>
+            <Form style={{ marginTop: "3rem" }}>
+              <FieldWrapper style={{ marginBottom: "3rem" }}>
                 <Field
                   as={TextField}
                   variant="outlined"
@@ -140,7 +140,7 @@ const UpdateProfile = () => {
                   helperText={touched.lastName && errors.lastName}
                 />
               </FieldWrapper>
-              <FieldWrapper>
+              <FieldWrapper style={{ width: "49.3%", marginBottom: "3rem" }}>
                 <Field
                   as={TextField}
                   variant="outlined"
@@ -179,7 +179,6 @@ const UpdateProfile = () => {
               <FieldWrapper>
                 <StyledButton
                   type="submit"
-                  fullWidth
                   variant="contained"
                   color="secondary"
                   onClick={() => console.log("save")}
@@ -187,7 +186,6 @@ const UpdateProfile = () => {
                   Save
                 </StyledButton>
                 <StyledButton
-                  fullWidth
                   variant="contained"
                   color="primary"
                   onClick={handleCancelEdit}

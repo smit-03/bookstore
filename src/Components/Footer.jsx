@@ -1,25 +1,20 @@
 import React from "react";
-import logo from "../assets/images/logo.svg";
 import styled from "@emotion/styled";
+import Logo from "./Logo";
 
 const FooterContainer = styled("footer")`
   /* position: static; */
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #212121;
-  color: white;
+  background-color: #f9ffcd;
+  color: #414141;
   padding: 2vh 5vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-`;
-
-const LogoImage = styled("img")`
-  height: 5vh;
-  width: auto;
 `;
 
 const FooterText = styled("div")`
@@ -30,7 +25,7 @@ const FooterText = styled("div")`
 const Footer = () => {
   return (
     <FooterContainer>
-      <LogoImage src={logo} alt="SMIT PATIVALA" />
+      <Logo />
       <FooterText>&copy; 2023. My Website. All Rights Reserved.</FooterText>
     </FooterContainer>
   );

@@ -1,80 +1,44 @@
-import React, { createContext, useState, useEffect } from "react";
-import request from "./request";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import { useAuthContext } from "./auth.context";
+import cartService from "../service/cart.service";
 
-export const CartContext = createContext();
+const initialCartDetails = {
+    cartData: [],
+    updateCart: () => { },
+    emptyCart: () => { },
+}
 
-export const CartProvider = ({ children }) => {
+const CartContext = createContext(initialCartDetails);
+
+export const CartWrapper = ({ children }) => {
     const authContext = useAuthContext();
-    const [cartItems, setCartItems] = useState([]);
+    const [cartData, setCartData] = useState([]);
+    const emptyCart = () => {
+        setCartData([]);
+    };
+    const updateCart = (updateCartList) => {
+        if (updateCartList) {
+            setCartData(updateCartList);
+        }
+        else if (authContext.user.id) {
+            cartService
+                .getList(authContext.user.id)
+                .then((res) => setCartData(res));
+        }
+    }
 
     useEffect(() => {
-        const fetchCartItems = async () => {
-            try {
-                const userId = authContext.user.id;
-                const response = await request.get(`/api/cart?userId=${userId}`);
-                setCartItems(response);
-            } catch (error) {
-                console.error("Error getting cart items:", error);
-            }
-        };
+        updateCart();
+    }, [authContext.user.id])
 
-        fetchCartItems();
-    }, []);
-
-    const addToCart = async (book) => {
-        try {
-            const userId = authContext.user.id;
-            const body = {
-                bookId: book.id,
-                userId: userId,
-                quantity: 1,
-            };
-            await request.post("/api/cart", body);
-            setCartItems([...cartItems, book]);
-        } catch (error) {
-            console.error("Error adding item to cart:", error);
-        }
+    const value = {
+        cartData,
+        emptyCart,
+        updateCart,
     };
+    return <CartContext.Provider value={value}>{children}</CartContext.Provider>
+};
 
-    const removeFromCart = async (cartItemId) => {
-        try {
-            await request.delete(`/api/cart?id=${cartItemId}`);
-            const updatedCartItems = cartItems.filter((item) => item.id !== cartItemId);
-            setCartItems(updatedCartItems);
-        } catch (error) {
-            console.error("Error removing item from cart:", error);
-        }
-    };
-
-    const updateCartItemQuantity = async (cartItemId, newQuantity) => {
-        try {
-            const body = {
-                id: cartItemId,
-                bookId: cartItems.find((item) => item.id === cartItemId).bookId,
-                userId: authContext.user.id,
-                quantity: newQuantity,
-            };
-            await request.put("/api/cart", body);
-            const updatedCartItems = cartItems.map((item) =>
-                item.id === cartItemId ? { ...item, quantity: newQuantity } : item
-            );
-            setCartItems(updatedCartItems);
-        } catch (error) {
-            console.error("Error updating cart item quantity:", error);
-        }
-    };
-
-    return (
-        <CartContext.Provider
-            value={{
-                cartItems,
-                addToCart,
-                removeFromCart,
-                updateCartItemQuantity,
-            }}
-        >
-            {children}
-        </CartContext.Provider>
-    );
+export const useCartContext = () => {
+    return useContext(CartContext);
 };

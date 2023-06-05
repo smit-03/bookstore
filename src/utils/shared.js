@@ -1,4 +1,27 @@
+import { toast } from "react-toastify";
+import cartService from "../service/cart.service";
 import { Role, RoutePaths } from "./enum";
+
+const addToCart = async (book, id) => {
+    return cartService
+        .add({
+            userId: id,
+            bookId: book.id,
+            quantity: 1,
+        })
+        .then((res) => {
+            console.log("add ", res);
+            return { error: false, message: "Item added in cart" };
+        })
+        .catch((e) => {
+            if (e.status === 409) {
+                return { error: true };
+            }
+            console.log("error ", e);
+            toast.error("Something went wrong")
+            return { error: true };
+        });
+};
 
 const messages = {
     USER_DELETE: "are you sure you want to delete the user?",
@@ -50,6 +73,7 @@ const hasAccess = (pathname, user) => {
 };
 
 export default {
+    addToCart,
     messages,
     hasAccess,
     localStorageKeys,

@@ -14,6 +14,7 @@ import {
   InfoContainer,
   SectionTitle,
   StyledButton,
+  PageTitle,
 } from "../../style";
 import { useAuthContext } from "../../context/auth.context";
 import Loading from "../../Components/Loading";
@@ -84,16 +85,19 @@ const Login = () => {
           <Typography color="textPrimary">Login</Typography>
           <Link
             to={RoutePaths.register}
-            style={{ textDecoration: "none", color: "red" }}
+            style={{ textDecoration: "none", color: "#fb3c3c" }}
           >
             Register
           </Link>
         </BreadcrumbsContainer>
+        <PageTitle mb={4} mt={3} mr={8}>
+          Login
+        </PageTitle>
         <MainContainer>
           <InfoContainer>
             <SectionTitle>New Customer</SectionTitle>
             <div>
-              <Link to={RoutePaths.register} style={{ color: "red" }}>
+              <Link to={RoutePaths.register} style={{ color: "#fb3c3c" }}>
                 Registration is free and easy
               </Link>
             </div>

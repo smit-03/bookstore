@@ -379,7 +379,6 @@ const Users = () => {
                 <FieldWrapper>
                   <StyledButton
                     type="submit"
-                    fullWidth
                     variant="contained"
                     color="secondary"
                     onClick={() => console.log("save")}
@@ -387,7 +386,6 @@ const Users = () => {
                     Save
                   </StyledButton>
                   <StyledButton
-                    fullWidth
                     variant="contained"
                     color="primary"
                     onClick={handleCancelEdit}
