@@ -1,4 +1,4 @@
-import { React, useContext } from "react";
+import React, { useContext } from "react";
 import {
   Dialog,
   DialogContent,
@@ -23,8 +23,8 @@ const BookDetailsOverlay = ({ book, onClose }) => {
       if (res.error) {
         toast.error(res.message);
       } else {
-        toast.success(res.message);
         cartContext.updateCart();
+        toast.success(res.message);
       }
     });
   };
@@ -41,7 +41,10 @@ const BookDetailsOverlay = ({ book, onClose }) => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          maxWidth: "30vw",
+          maxHeight: "80vh",
+          minWidth: "320px",
+          minHeight: "470px",
+          maxWidth: "40vw",
           overflow: "hidden",
         },
       }}
@@ -69,21 +72,34 @@ const BookDetailsOverlay = ({ book, onClose }) => {
             alignItems: "center",
           }}
         >
-          <div style={{ heigh: "18%", width: "35%" }}>
+          <div
+            style={{
+              height: "18%",
+              width: "35%",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <img
               src={base64image}
               alt={name}
-              style={{ width: "100%", height: "100%" }}
+              style={{
+                minWidth: "150px",
+                minHeight: "200px",
+                maxWidth: "100%",
+                maxHeight: "100%",
+                objectFit: "contain",
+              }}
             />
           </div>
-          <Typography variant="h4" align="center">
+          <Typography variant="h5" align="center">
             {name}
           </Typography>
           <Typography variant="subtitle1" align="center">
             {description}
           </Typography>
-          <Typography variant="h5" align="center">
-            MRP : Rs. {price}
+          <Typography variant="h6" align="center">
+            MRP: &#8377; {price}
           </Typography>
           <Button
             variant="contained"

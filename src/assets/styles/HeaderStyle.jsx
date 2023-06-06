@@ -11,6 +11,7 @@ export const HeaderContainer = styled("header")`
   align-items: center;
   z-index: 999;
   width: 100vw;
+  opacity: 0.9;
 `;
 
 export const Title = styled(Typography)`

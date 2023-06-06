@@ -1,6 +1,6 @@
 import { Container, Button, IconButton } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { PageTitle, StyledButton } from "../../style";
+import { PageTitle } from "../../style";
 import { useAuthContext } from "../../context/auth.context";
 import { useCartContext } from "../../context/cart.context";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,24 @@ import shared from "../../utils/shared";
 import { RoutePaths } from "../../utils/enum";
 import { styled } from "@mui/system";
 import DeleteIcon from "@mui/icons-material/Delete";
+import emptycart from "../../assets/images/emptycart.png";
 
+const EmptyCart = styled("div")`
+  top: 0;
+  left: 0;
+  right: 0;
+  position: fixed;
+  height: 88vh;
+  width: 100%;
+  background-color: #f8f8f8;
+`;
+
+const CartImage = styled("img")`
+  width: 60vw;
+  height: 33vw;
+  margin-left: 20%;
+  margin-top: 7vh;
+`;
 const ItemContainer = styled("div")`
   width: 60%;
   display: flex;
@@ -152,77 +169,106 @@ const Cart = () => {
   };
 
   return (
-    <Container style={{ marginTop: "15vh" }}>
-      <PageTitle>Cart Page</PageTitle>
-      <span style={{ margin: "0 24%", fontWeight: "600", fontSize: "1.3rem" }}>
-        My Cart ({cartList.length} Items)
-      </span>
-      <ItemContainer>
-        {cartList.map((cartItem) => {
-          return (
-            <CartItem key={cartItem.id}>
-              <BookImage
-                src={cartItem.book.base64image}
-                alt={cartItem.book.name}
-              />
-              <div>
-                <div style={{ fontWeight: "bold" }}>{cartItem.book.name}</div>
-                <ButtonContainer>
-                  <QuantityButton
-                    variant="contained"
-                    onClick={() => updateQuantity(cartItem, true)}
+    <>
+      {itemsInCart ? (
+        <Container Container style={{ marginTop: "15vh" }}>
+          <PageTitle>Cart Page</PageTitle>
+          <span
+            style={{ margin: "0 24%", fontWeight: "600", fontSize: "1.3rem" }}
+          >
+            My Cart ({itemsInCart} Items)
+          </span>
+          <ItemContainer>
+            {cartList.map((cartItem) => {
+              return (
+                <CartItem key={cartItem.id}>
+                  <BookImage
+                    src={cartItem.book.base64image}
+                    alt={cartItem.book.name}
+                  />
+                  <div>
+                    <div style={{ fontWeight: "bold" }}>
+                      {cartItem.book.name}
+                    </div>
+                    <ButtonContainer>
+                      <QuantityButton
+                        variant="contained"
+                        onClick={() => updateQuantity(cartItem, true)}
+                      >
+                        +
+                      </QuantityButton>
+                      <Quant>{cartItem.quantity}</Quant>
+                      <QuantityButton
+                        variant="contained"
+                        onClick={() => updateQuantity(cartItem, false)}
+                      >
+                        -
+                      </QuantityButton>
+                    </ButtonContainer>
+                  </div>
+                  <Container
+                    style={{
+                      width: "auto",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-end",
+                      marginRight: 0,
+                      right: 0,
+                    }}
                   >
-                    +
-                  </QuantityButton>
-                  <Quant>{cartItem.quantity}</Quant>
-                  <QuantityButton
-                    variant="contained"
-                    onClick={() => updateQuantity(cartItem, false)}
-                  >
-                    -
-                  </QuantityButton>
-                </ButtonContainer>
-              </div>
-              <Container
-                style={{
-                  width: "auto",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-end",
-                  marginRight: 0,
-                  right: 0,
-                }}
-              >
-                <div
-                  style={{ alignItems: "end", right: 0, fontWeight: "bold" }}
-                >
-                  MRP &#8377; {cartItem.book.price}
-                </div>
-                <IconButton
-                  onClick={() => removeItem(cartItem.id)}
-                  style={{ alignItems: "center" }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Container>
-            </CartItem>
-          );
-        })}
-      </ItemContainer>
-      <span style={{ margin: "0% 24%", fontWeight: "600", fontSize: "1.3rem" }}>
-        Total Amount : &#8377; {totalPrice}
-      </span>
-      <StyledButton
-        style={{
-          color: "white",
-          backgroundColor: "#f82626",
-          textTransform: "capitalize",
-        }}
-        onClick={PlaceOrder}
-      >
-        Place Order
-      </StyledButton>
-    </Container>
+                    <div
+                      style={{
+                        alignItems: "end",
+                        right: 0,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      MRP &#8377; {cartItem.book.price}
+                    </div>
+                    <IconButton
+                      onClick={() => removeItem(cartItem.id)}
+                      style={{ alignItems: "center" }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Container>
+                </CartItem>
+              );
+            })}
+          </ItemContainer>
+          <span
+            style={{ margin: "0% 24%", fontWeight: "600", fontSize: "1.3rem" }}
+          >
+            Total Amount : &#8377; {totalPrice}
+          </span>
+          <Button
+            style={{
+              color: "white",
+              backgroundColor: "#f82626",
+              textTransform: "capitalize",
+            }}
+            onClick={PlaceOrder}
+          >
+            Place Order
+          </Button>
+        </Container>
+      ) : (
+        <EmptyCart>
+          <CartImage src={emptycart} alt="emptycart" />
+          <Button
+            style={{
+              color: "white",
+              backgroundColor: "#f82626",
+              textTransform: "capitalize",
+              marginLeft: "47%",
+            }}
+            onClick={() => navigate(RoutePaths.home)}
+          >
+            Shop Now
+          </Button>
+        </EmptyCart>
+      )}
+    </>
   );
 };
 

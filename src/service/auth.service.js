@@ -4,7 +4,6 @@ const ENDPOINT = "api/user";
 const login = async (data) => {
     const url = `${ENDPOINT}/Login`;
     return request.post(url, data).then((res) => {
-        console.log(res);
         return res;
     })
 };

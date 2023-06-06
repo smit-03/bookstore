@@ -7,7 +7,6 @@ import {
   Button,
   Paper,
   Grid,
-  Link,
   Snackbar,
   Alert,
 } from "@mui/material";
@@ -127,16 +126,6 @@ const ContactPage = () => {
             </Grid>
           </Grid>
         </form>
-        <StyledTypography
-          variant="body2"
-          align="center"
-          marginTop="4vh"
-          marginBottom="auto"
-        >
-          Need immediate assistance? Visit the{" "}
-          <Link href="/contact">Customer Service</Link> page for answers to
-          common questions.
-        </StyledTypography>
       </StyledPaper>
       <Snackbar
         open={showSnackbar}

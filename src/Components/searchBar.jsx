@@ -1,5 +1,6 @@
 import SearchIcon from "@mui/icons-material/Search";
 import "../assets/styles/searchBar.css";
+import { Button } from "@mui/material";
 
 export const SearchBar = ({ onSearch, setInput }) => {
   const handleChange = (value) => {
@@ -20,18 +21,24 @@ export const SearchBar = ({ onSearch, setInput }) => {
   );
 };
 
-const SearchResult = ({ result }) => {
+const SearchResult = ({ result, addToCart }) => {
   return (
-    <div
-      className="search-result"
-      onClick={(e) => alert(`You selected ${result}!`)}
-    >
-      {result}
+    <div className="search-result" style={{ display: "flex" }}>
+      <span style={{ overflow: "hidden" }}>{result.name}</span>
+      <Button
+        size="small"
+        style={{ marginLeft: "auto" }}
+        onClick={() => {
+          addToCart(result);
+        }}
+      >
+        Add
+      </Button>
     </div>
   );
 };
 
-export const SearchResultsList = ({ results }) => {
+export const SearchResultsList = ({ results, addToCart }) => {
   return (
     <>
       {console.log(results)}
@@ -40,8 +47,12 @@ export const SearchResultsList = ({ results }) => {
       ) : (
         <div className="results-list-container">
           <div className="results-list">
-            {results.map((result) => (
-              <SearchResult result={result.name} key={result.id} />
+            {results.slice(0, 15).map((result) => (
+              <SearchResult
+                result={result}
+                addToCart={addToCart}
+                key={result.id}
+              />
             ))}
           </div>
         </div>

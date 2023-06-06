@@ -17,6 +17,7 @@ import {
   PageTitle,
 } from "../../style";
 import { styled } from "@mui/system";
+import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import BookDetailsOverlay from "./BookDetailsOverlay";
 import {
@@ -28,10 +29,11 @@ import shared from "../../utils/shared";
 import { useAuthContext } from "../../context/auth.context";
 import { useCartContext } from "../../context/cart.context";
 import { toast } from "react-toastify";
+import { RoutePaths } from "../../utils/enum";
 
 const BookListing = () => {
   const [books, setBooks] = useState([]);
-  const [pageSize, setPageSize] = useState(8);
+  const pageSize = 8;
   const [keyword, setKeyword] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedBook, setSelectedBook] = useState(null);
@@ -40,7 +42,7 @@ const BookListing = () => {
   const [loading, setLoading] = useState(true);
   const authContext = useAuthContext();
   const cartContext = useCartContext();
-
+  const navigate = useNavigate();
   const openBookDetails = (book) => {
     setSelectedBook(book);
   };
@@ -84,14 +86,18 @@ const BookListing = () => {
   }, [sortOrder, books]);
 
   const addToCart = (book) => {
-    shared.addToCart(book, authContext.user.id).then((res) => {
-      if (res.error) {
-        console.log(res.error);
-      } else {
-        toast.success(res.message);
-        cartContext.updateCart();
-      }
-    });
+    if (!authContext.user.id) {
+      navigate(RoutePaths.login);
+      toast.error("Please Login");
+    } else
+      shared.addToCart(book, authContext.user.id).then((res) => {
+        if (res.error) {
+          toast.error(res.error);
+        } else {
+          cartContext.updateCart();
+          toast.success(res.message);
+        }
+      });
   };
 
   const sortBooks = () => {
@@ -116,18 +122,7 @@ const BookListing = () => {
     setCurrentPage(page);
   };
   if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Loading />
-      </div>
-    );
+    return <Loading />;
   }
   const StyledTextField = styled(TextField)`
     .MuiSelect-root {
@@ -198,7 +193,7 @@ const BookListing = () => {
               <BookName variant="h6" style={{ fontSize: "1rem" }}>
                 {book.name}
               </BookName>
-              <BookSub variant="subname1">Rs. {book.price}</BookSub>
+              <BookSub variant="subname1">&#8377; {book.price}</BookSub>
               <Button
                 variant="contained"
                 color="primary"

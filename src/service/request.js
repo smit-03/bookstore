@@ -3,14 +3,6 @@ import { toast } from "react-toastify";
 
 let requests = [];
 
-function showLoader() {
-    document.body.classList.add("loader-open");
-}
-
-function hideLoader() {
-    document.body.classList.remove("loader-open");
-}
-
 const request = axios.create({
     baseURL: "https://book-e-sell-node-api.vercel.app/",
     timeout: 12400000,
@@ -25,7 +17,6 @@ request.interceptors.request.use(
         }
 
         requests.push(config.url);
-        showLoader();
 
         return config;
     },
@@ -39,7 +30,7 @@ request.interceptors.request.use(
 request.interceptors.response.use(
     (response) => {
         const { data } = response;
-        console.log("responseeee,", response);
+        console.log("response,", response);
         removeRequest(response.config.url);
         if (data?.code && data?.code !== 200) {
             toast.error(
@@ -63,11 +54,5 @@ function removeRequest(req) {
     if (i >= 0) {
         requests.splice(i, 1);
     }
-
-    if (requests.length === 0) {
-        hideLoader();
-    }
 }
-
-export { showLoader, hideLoader };
 export default request;

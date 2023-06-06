@@ -1,6 +1,6 @@
 .input-wrapper {
   width: 25%;
-  height: 3vw;
+  height: 45px;
   border: none;
   border-radius: 10px;
   padding: 0 6px;
@@ -46,7 +46,7 @@ input:focus {
   max-height: 20vh;
   color: black;
   overflow: auto;
-  margin-left: 63.5vw;
+  margin-left: 64.5vw;
   position: fixed;
   z-index: 9999;
   top: 2.7vh;

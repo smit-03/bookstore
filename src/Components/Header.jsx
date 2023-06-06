@@ -36,6 +36,7 @@ const Header = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const [input, setInput] = useState("");
+  const [searchBarRef, setSearchBarRef] = useState(null);
   const resultsListRef = useRef(null);
 
   const [authContextUpdated, setAuthContextUpdated] = useState(false);
@@ -154,7 +155,11 @@ const Header = () => {
             {!isTabletOrSmaller && <NavigationLinks key={authContextUpdated} />}
 
             {/* Searchbar */}
-            <SearchBar onSearch={handleSearch} setInput={setInput} />
+            <SearchBar
+              onSearch={handleSearch}
+              setInput={setInput}
+              setRef={setSearchBarRef} // Pass the setSearchBarRef function as a prop
+            />
 
             {/* SignIn/Logout-button/Icon */}
             {authContext.user.id ? (
@@ -227,14 +232,16 @@ const Header = () => {
               onClick={() => navigate(RoutePaths.cart)}
             >
               <ShoppingCartIcon />
-              <CounteItem>{cartContext.cartData.length}</CounteItem>
+              <CounteItem>
+                {authContext.user.id ? cartContext.cartData.length : ""}
+              </CounteItem>
             </IconButton>
           </Toolbar>
         </AppBar>
       </HeaderContainer>
       {showResults && searchResults && (
         <ResultContainer ref={resultsListRef}>
-          <SearchResultsList results={searchResults} />
+          <SearchResultsList results={searchResults} addToCart={addToCart} />
         </ResultContainer>
       )}
     </>

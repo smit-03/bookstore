@@ -11,8 +11,6 @@ export const searchBook = (searchText) => {
 
 
 export const getAllPaginatedBooks = (pageSize, pageIndex) => {
-    console.log("bs", pageSize)
-    console.log("bs", pageIndex)
     const url = `${ENDPOINT}?pageSize=${pageSize}&pageIndex=${pageIndex}`;
     return request.get(url).then((res) => {
         return res;
@@ -20,8 +18,6 @@ export const getAllPaginatedBooks = (pageSize, pageIndex) => {
 };
 
 export const getAllBooksOfKeyword = (pageSize, pageIndex, keyword) => {
-    console.log("bsk", pageSize)
-    console.log("bsk", pageIndex)
     const url = `${ENDPOINT}?pageSize=${pageSize}&pageIndex=${pageIndex}&keyword=${keyword}`;
     return request.get(url).then((res) => {
         return res;
