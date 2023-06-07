@@ -21,13 +21,18 @@ const EmptyCart = styled("div")`
   height: 88vh;
   width: 100%;
   background-color: #f8f8f8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `;
 
 const CartImage = styled("img")`
-  width: 60vw;
-  height: 33vw;
-  margin-left: 20%;
-  margin-top: 7vh;
+  width: 45vw;
+  height: 25vw;
+  min-width: 320px;
+  min-height: 200px;
+  margin-bottom: 5vh;
 `;
 const ItemContainer = styled("div")`
   width: 60%;
@@ -256,11 +261,12 @@ const Cart = () => {
         <EmptyCart>
           <CartImage src={emptycart} alt="emptycart" />
           <Button
+            size="large"
             style={{
               color: "white",
               backgroundColor: "#f82626",
               textTransform: "capitalize",
-              marginLeft: "47%",
+              // marginLeft: "47vw",
             }}
             onClick={() => navigate(RoutePaths.home)}
           >
